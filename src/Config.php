@@ -128,8 +128,7 @@ final class Config
     /**
      * Get slot duration in minutes
      *
-     * Default: 60 minutes (1 hour)
-     * Override in wp-config.php: define('CS_SLOT_DURATION', 30);
+     * Priority: 1) Admin settings (cs_options), 2) wp-config.php constant, 3) default
      *
      * Common values:
      * - 15 minutes (very short consultations)
@@ -141,6 +140,16 @@ final class Config
      */
     public static function getSlotDuration(): int
     {
+        // Priority 1: Admin settings
+        $options = get_option('cs_options', []);
+        if (isset($options['slot_duration']) && is_numeric($options['slot_duration'])) {
+            $duration = (int) $options['slot_duration'];
+            if (in_array($duration, [15, 30, 60, 90, 120], true)) {
+                return $duration;
+            }
+        }
+
+        // Priority 2: wp-config.php constant
         $duration = defined('CS_SLOT_DURATION') ? CS_SLOT_DURATION : 60;
 
         // Validate: must be positive integer
@@ -165,8 +174,7 @@ final class Config
     /**
      * Get buffer time in minutes (time blocked after each booking)
      *
-     * Default: 0 minutes (no buffer)
-     * Override in wp-config.php: define('CS_BUFFER_TIME', 15);
+     * Priority: 1) Admin settings (cs_options), 2) wp-config.php constant, 3) default
      *
      * Use cases:
      * - 0 minutes: Back-to-back bookings
@@ -178,6 +186,18 @@ final class Config
      */
     public static function getBufferTime(): int
     {
+        $slot_duration = self::getSlotDuration();
+
+        // Priority 1: Admin settings
+        $options = get_option('cs_options', []);
+        if (isset($options['buffer_time']) && is_numeric($options['buffer_time'])) {
+            $buffer = (int) $options['buffer_time'];
+            if ($buffer >= 0 && $buffer < $slot_duration) {
+                return $buffer;
+            }
+        }
+
+        // Priority 2: wp-config.php constant
         $buffer = defined('CS_BUFFER_TIME') ? CS_BUFFER_TIME : 0;
 
         // Validate: must be non-negative integer
@@ -186,7 +206,6 @@ final class Config
         }
 
         // Validate: buffer shouldn't exceed slot duration (makes no sense)
-        $slot_duration = self::getSlotDuration();
         if ($buffer >= $slot_duration) {
             trigger_error(
                 "CS_BUFFER_TIME ($buffer) should be less than CS_SLOT_DURATION ($slot_duration). Using 0.",

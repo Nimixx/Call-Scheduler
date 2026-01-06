@@ -1,0 +1,152 @@
+.cs-settings-page {
+    max-width: 800px;
+}
+
+/* Settings Card */
+.cs-settings-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-left: 4px solid #2271b1;
+    padding: 0;
+    margin: 20px 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.cs-settings-header {
+    padding: 20px;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.cs-settings-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #1d2327;
+    margin: 0;
+}
+
+.cs-settings-title .dashicons {
+    color: #2271b1;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+}
+
+.cs-settings-body {
+    padding: 20px;
+}
+
+/* Form Row */
+.cs-form-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.cs-form-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.cs-form-row:first-child {
+    padding-top: 0;
+}
+
+.cs-form-label {
+    flex: 0 0 200px;
+    padding-right: 20px;
+}
+
+.cs-form-label label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1d2327;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.cs-form-label .description {
+    font-size: 13px;
+    color: #646970;
+    margin: 0;
+}
+
+.cs-form-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cs-form-field .cs-input {
+    width: 100px;
+    height: 40px;
+    font-size: 15px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    padding: 0 12px;
+    text-align: center;
+}
+
+.cs-form-field .cs-input:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: none;
+}
+
+.cs-form-field .cs-unit {
+    font-size: 14px;
+    color: #646970;
+}
+
+/* Settings Footer */
+.cs-settings-footer {
+    background: #f6f7f7;
+    border-top: 1px solid #dcdcde;
+    padding: 15px 20px;
+}
+
+/* Info Box */
+.cs-info-box {
+    background: #f0f6fc;
+    border-left: 4px solid #72aee6;
+    padding: 12px 16px;
+    margin: 20px 0;
+}
+
+.cs-info-box p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #1d2327;
+}
+
+.cs-info-box .dashicons {
+    color: #2271b1;
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+    .cs-form-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cs-form-label {
+        flex: none;
+        padding-right: 0;
+    }
+
+    .cs-form-field .cs-input {
+        width: 100%;
+        max-width: 150px;
+    }
+}

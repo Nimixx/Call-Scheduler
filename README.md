@@ -34,9 +34,22 @@ define('CS_MAX_BOOKING_DAYS', 30); // Days ahead for booking
 ## Development
 
 ```bash
-composer install   # Install dependencies
-composer test      # Run tests
+composer install          # Install dependencies
+composer test:standalone  # Run standalone tests (no WordPress required)
+./bin/build.sh            # Build production zip
 ```
+
+## Release
+
+Releases are made from the `main` branch:
+
+```bash
+git checkout main
+git merge develop
+./bin/release.sh 1.0.0   # Bumps version, tags, pushes to GitHub
+```
+
+GitHub Actions automatically creates the release with the production zip.
 
 ## License
 

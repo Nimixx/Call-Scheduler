@@ -64,11 +64,16 @@ echo -e "Version:  ${BLUE}${VERSION}${NC}"
 echo -e "Dry run:  ${DRY_RUN}"
 echo ""
 
-# Check we're on main or develop branch
+# Check we're on main branch (production releases only from main)
 CURRENT_BRANCH=$(git branch --show-current)
-if [[ "$CURRENT_BRANCH" != "main" && "$CURRENT_BRANCH" != "develop" ]]; then
-    echo -e "${RED}Error: Releases must be made from 'main' or 'develop' branch${NC}"
+if [[ "$CURRENT_BRANCH" != "main" ]]; then
+    echo -e "${RED}Error: Releases must be made from 'main' branch${NC}"
     echo -e "Current branch: ${CURRENT_BRANCH}"
+    echo ""
+    echo "To release, first merge develop into main:"
+    echo "  git checkout main"
+    echo "  git merge develop"
+    echo "  ./bin/release.sh ${VERSION}"
     exit 1
 fi
 

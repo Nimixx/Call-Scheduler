@@ -270,7 +270,7 @@ final class BookingsRenderer
         $links = [];
         foreach ($availableStatuses as $status) {
             $links[] = sprintf(
-                '<a href="#" onclick="wbChangeStatus(%d, \'%s\'); return false;">%s</a>',
+                '<a href="#" onclick="csChangeStatus(%d, \'%s\'); return false;">%s</a>',
                 $booking->id,
                 esc_attr($status),
                 esc_html(BookingStatus::label($status))
@@ -283,7 +283,7 @@ final class BookingsRenderer
             |
             <span class="delete">
                 <a href="#"
-                   onclick="wbDeleteBooking(<?php echo esc_attr($booking->id); ?>); return false;"
+                   onclick="csDeleteBooking(<?php echo esc_attr($booking->id); ?>); return false;"
                    class="submitdelete">
                     <?php echo esc_html__('Smazat', 'call-scheduler'); ?>
                 </a>

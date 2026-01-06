@@ -6,7 +6,6 @@ namespace CallScheduler\Admin;
 
 use CallScheduler\Admin\Availability\AvailabilityPage;
 use CallScheduler\Admin\Bookings\BookingsPage;
-use CallScheduler\Admin\EmailDesigner\EmailDesignerPage;
 use CallScheduler\Admin\Settings\SettingsPage;
 use CallScheduler\Admin\Settings\Modules\WhitelabelModule;
 
@@ -25,13 +24,11 @@ final class AdminPages
     {
         $bookingsPage = new BookingsPage();
         $availabilityPage = new AvailabilityPage();
-        $emailDesignerPage = new EmailDesignerPage();
         $settingsPage = new SettingsPage();
 
         // Register hooks for asset enqueuing
         $bookingsPage->register();
         $availabilityPage->register();
-        $emailDesignerPage->register();
         $settingsPage->register();
 
         // Get plugin name (whitelabel or default)
@@ -56,16 +53,6 @@ final class AdminPages
             'manage_options',                                  // Capability
             'cs-availability',                                 // Menu slug
             [$availabilityPage, 'render']                      // Callback
-        );
-
-        // Submenu page - Email Designer
-        add_submenu_page(
-            'cs-bookings',                                     // Parent slug
-            __('Email Designer', 'call-scheduler'),            // Page title
-            __('Email Designer', 'call-scheduler'),            // Menu title
-            'manage_options',                                  // Capability
-            'cs-email-designer',                               // Menu slug
-            [$emailDesignerPage, 'render']                     // Callback
         );
 
         // Submenu page - Settings

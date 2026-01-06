@@ -2,7 +2,7 @@
     "name": "call-scheduler/call-scheduler",
     "description": "Simple booking system for sales calls",
     "type": "wordpress-plugin",
-    "license": "GPL-2.0-or-later",
+    "license": "MIT",
     "require": {
         "php": ">=8.0"
     },

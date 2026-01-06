@@ -53,4 +53,4 @@ GitHub Actions automatically creates the release with the production zip.
 
 ## License
 
-GPL-2.0-or-later
+MIT License - see [LICENSE](LICENSE) for details.

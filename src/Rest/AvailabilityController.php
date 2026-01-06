@@ -144,7 +144,8 @@ final class AvailabilityController extends RestController
                 'available' => !$this->isSlotBlocked($current, $blocked_periods),
             ];
 
-            $current += $slot_duration;
+            // Move to next slot: duration + buffer gives proper spacing
+            $current += $slot_duration + $buffer_time;
         }
 
         return $slots;

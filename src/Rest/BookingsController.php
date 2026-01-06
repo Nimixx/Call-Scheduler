@@ -209,11 +209,8 @@ final class BookingsController extends RestController
             return $this->errorResponse('invalid_time', 'Invalid time. Hours must be 00-23, minutes 00-59.');
         }
 
-        if (!Config::isValidSlotTime($time)) {
-            $slot_duration = Config::getSlotDuration();
-            $examples = $this->getSlotExamples();
-            return $this->errorResponse('invalid_time', "Bookings must be on {$slot_duration}-minute intervals (e.g., {$examples}).");
-        }
+        // Note: Slot boundary validation removed - frontend uses availability API
+        // which returns only valid slots. Working hours checked in validateAvailability().
 
         return null;
     }
@@ -262,21 +259,4 @@ final class BookingsController extends RestController
         return null;
     }
 
-    private function getSlotExamples(): string
-    {
-        $slot_duration = Config::getSlotDuration();
-        $examples = [];
-
-        for ($i = 0; $i < 3; $i++) {
-            $minutes = $i * $slot_duration;
-            $hours = 9;
-            if ($minutes >= 60) {
-                $hours += floor($minutes / 60);
-                $minutes = $minutes % 60;
-            }
-            $examples[] = sprintf('%02d:%02d', $hours, $minutes);
-        }
-
-        return implode(', ', $examples);
-    }
 }

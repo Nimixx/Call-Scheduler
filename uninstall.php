@@ -21,6 +21,7 @@ $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}cs_availability");
 
 // Delete plugin options
 delete_option('cs_db_version');
+delete_option('cs_options');
 
 // Delete all user meta
 $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key = 'cs_is_team_member'");

@@ -111,6 +111,9 @@ final class Plugin
 
     public function onInit(): void
     {
+        // Load translations
+        load_plugin_textdomain('call-scheduler', false, dirname(plugin_basename(CS_PLUGIN_FILE)) . '/languages');
+
         // Run database upgrades if needed
         Installer::maybeUpgrade();
     }

@@ -7,6 +7,7 @@ namespace CallScheduler\Admin\Settings;
 use CallScheduler\Admin\Settings\Modules\AbstractSettingsModule;
 use CallScheduler\Admin\Settings\Modules\SettingsModuleInterface;
 use CallScheduler\Admin\Settings\Modules\TimingModule;
+use CallScheduler\Admin\Settings\Modules\WebhookModule;
 use CallScheduler\Admin\Settings\Modules\WhitelabelModule;
 
 if (!defined('ABSPATH')) {
@@ -32,6 +33,7 @@ final class SettingsPage
         $this->modules = [
             new TimingModule(),
             new WhitelabelModule(),
+            new WebhookModule(),
         ];
     }
 
@@ -127,6 +129,10 @@ final class SettingsPage
             // Whitelabel
             'whitelabel_enabled' => false,
             'whitelabel_plugin_name' => '',
+            // Webhooks
+            'webhook_enabled' => false,
+            'webhook_url' => '',
+            'webhook_secret' => '',
         ];
 
         return wp_parse_args($options, $defaults);

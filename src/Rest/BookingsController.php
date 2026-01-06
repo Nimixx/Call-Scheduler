@@ -7,6 +7,7 @@ namespace CallScheduler\Rest;
 use CallScheduler\BookingStatus;
 use CallScheduler\Config;
 use CallScheduler\Email;
+use CallScheduler\Plugin;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
@@ -152,14 +153,19 @@ final class BookingsController extends RestController
 
         // Send confirmation emails (non-blocking)
         $booking_data = [
+            'id' => $booking_id,
             'customer_name' => $customer_name,
             'customer_email' => $customer_email,
             'booking_date' => $booking_date,
             'booking_time' => $booking_time,
             'user_id' => $user_id,
+            'status' => BookingStatus::PENDING,
         ];
         $this->email->sendCustomerConfirmation($booking_data);
         $this->email->sendTeamMemberNotification($booking_data);
+
+        // Send webhook notification (non-blocking)
+        Plugin::getContainer()->webhook()->sendBookingCreated($booking_data);
 
         return $this->successResponse([
             'id' => $booking_id,

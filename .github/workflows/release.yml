@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+  # Manual trigger with version input
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag or input
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
+      - name: Verify version matches plugin file
+        run: |
+          PLUGIN_VERSION=$(grep -E "^\s*\*\s*Version:" call-scheduler.php | sed 's/.*Version:\s*//' | tr -d '[:space:]')
+          INPUT_VERSION="${{ steps.version.outputs.version }}"
+
+          if [ "$PLUGIN_VERSION" != "$INPUT_VERSION" ]; then
+            echo "::error::Version mismatch! Plugin file has $PLUGIN_VERSION but releasing $INPUT_VERSION"
+            echo "Please update the version in call-scheduler.php first"
+            exit 1
+          fi
+
+          echo "Version verified: $PLUGIN_VERSION"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+
+      - name: Run tests
+        run: |
+          php tests/standalone-tests.php
+          php tests/settings-standalone-tests.php
+
+      - name: Build plugin
+        run: |
+          chmod +x bin/build.sh
+          ./bin/build.sh ${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Call Scheduler v${{ steps.version.outputs.version }}
+          tag_name: v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+          generate_release_notes: true
+          files: |
+            build/call-scheduler-${{ steps.version.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: call-scheduler-${{ steps.version.outputs.version }}
+          path: build/call-scheduler-${{ steps.version.outputs.version }}.zip
+          retention-days: 30

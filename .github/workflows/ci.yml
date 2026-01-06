@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php }} Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: ['8.0', '8.1', '8.2', '8.3']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Run standalone tests
+        run: |
+          php tests/standalone-tests.php
+          php tests/settings-standalone-tests.php
+
+      - name: Verify plugin syntax
+        run: |
+          find src -name "*.php" -exec php -l {} \;
+          php -l call-scheduler.php
+
+  build:
+    name: Build Test
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test build script
+        run: |
+          chmod +x bin/build.sh
+          ./bin/build.sh
+
+      - name: Verify build output
+        run: |
+          test -f build/call-scheduler-*.zip
+          echo "Build successful!"

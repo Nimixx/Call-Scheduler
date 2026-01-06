@@ -22,7 +22,10 @@
     },
     "scripts": {
         "test": "phpunit",
-        "test:coverage": "phpunit --coverage-html coverage"
+        "test:coverage": "phpunit --coverage-html coverage",
+        "test:standalone": "php tests/standalone-tests.php && php tests/settings-standalone-tests.php",
+        "build": "bin/build.sh",
+        "release": "bin/release.sh"
     },
     "config": {
         "allow-plugins": {

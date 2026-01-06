@@ -27,3 +27,6 @@ Thumbs.db
 
 # Audit
 /audit/
+
+# Build output
+/build/

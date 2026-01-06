@@ -1,0 +1,78 @@
+# Files and directories to exclude from production release
+# Used by build script to create clean distribution zip
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Development files
+.editorconfig
+.prettierrc
+.eslintrc*
+.stylelintrc*
+.env
+.env.*
+
+# IDE and editor
+.idea
+.vscode
+.claude
+*.sublime-*
+.project
+.settings
+
+# Build and CI
+.github
+.gitlab-ci.yml
+.travis.yml
+bin
+build
+Makefile
+.distignore
+
+# Documentation (dev only)
+CLAUDE.md
+CONTRIBUTING.md
+CHANGELOG.md
+docs
+audit
+*.md
+!README.md
+
+# Testing
+tests
+phpunit.xml
+phpunit.xml.dist
+phpcs.xml
+phpcs.xml.dist
+.phpcs.xml
+.phpcs.xml.dist
+codeception.yml
+behat.yml
+
+# Composer - remove entirely (plugin uses PSR-4 autoloader)
+composer.json
+composer.lock
+vendor
+
+# Node.js (if any)
+node_modules
+package.json
+package-lock.json
+webpack.config.js
+gulpfile.js
+Gruntfile.js
+
+# Config examples
+config-example.php
+*.example
+*.sample
+
+# Other
+*.log
+*.cache
+.DS_Store
+Thumbs.db
+*.zip
+*.tar.gz

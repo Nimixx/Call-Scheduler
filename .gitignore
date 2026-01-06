@@ -24,3 +24,6 @@ Thumbs.db
 # Local config
 .env
 .env.local
+
+# Audit
+/audit/

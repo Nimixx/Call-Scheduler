@@ -53,6 +53,27 @@ define('CS_BUFFER_TIME', 15);
 define('CS_MAX_BOOKING_DAYS', 30);
 
 // ============================================================================
+// WEBHOOK CONFIGURATION (Optional)
+// ============================================================================
+
+/**
+ * Webhook Secret Key (for HMAC-SHA256 signature)
+ *
+ * Used to sign webhook payloads so the receiving endpoint can verify
+ * the request came from your WordPress site.
+ *
+ * SECURITY: This is stored here (not in database) to prevent exposure
+ * via SQL injection, database backups, or other plugin access.
+ *
+ * Generate a secure random key:
+ *   - Linux/Mac: openssl rand -hex 32
+ *   - Or use: https://randomkeygen.com (256-bit WEP Keys)
+ *
+ * The webhook URL is configured in: Settings > Call Scheduler > Webhooks
+ */
+// define('CS_WEBHOOK_SECRET', 'your-secret-key-here');
+
+// ============================================================================
 // END CALL SCHEDULER CONFIGURATION
 // ============================================================================
 

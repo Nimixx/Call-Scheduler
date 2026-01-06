@@ -129,10 +129,9 @@ final class SettingsPage
             // Whitelabel
             'whitelabel_enabled' => false,
             'whitelabel_plugin_name' => '',
-            // Webhooks
+            // Webhooks (secret stored in wp-config.php, not database)
             'webhook_enabled' => false,
             'webhook_url' => '',
-            'webhook_secret' => '',
         ];
 
         return wp_parse_args($options, $defaults);

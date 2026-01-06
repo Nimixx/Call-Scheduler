@@ -15,6 +15,11 @@ if (!defined('ABSPATH')) {
  * - Fire-and-forget (non-blocking) HTTP POST requests
  * - HMAC-SHA256 signature for payload verification
  * - Extensible event types
+ *
+ * Security:
+ * - Secret key stored in wp-config.php (CS_WEBHOOK_SECRET), not database
+ * - HTTPS enforced for webhook URLs
+ * - SSRF protection blocks internal URLs
  */
 final class Webhook
 {
@@ -104,6 +109,12 @@ final class Webhook
             return false;
         }
 
+        // Security: Enforce HTTPS at dispatch time as well
+        if (!str_starts_with($url, 'https://')) {
+            $this->logError('Webhook URL must use HTTPS');
+            return false;
+        }
+
         $json_payload = wp_json_encode($payload);
         if ($json_payload === false) {
             return false;
@@ -115,8 +126,8 @@ final class Webhook
             'X-CS-Timestamp' => $payload['timestamp'],
         ];
 
-        // Add HMAC signature if secret is configured
-        $secret = $options['webhook_secret'] ?? '';
+        // Security: Get secret from wp-config.php constant, NOT database
+        $secret = self::getSecret();
         if (!empty($secret)) {
             $signature = hash_hmac('sha256', $json_payload, $secret);
             $headers['X-CS-Signature'] = $signature;
@@ -131,23 +142,42 @@ final class Webhook
             'sslverify' => true,
         ];
 
-        // Allow filtering of webhook args
+        // Allow filtering of webhook args (for testing)
         $args = apply_filters('cs_webhook_args', $args, $payload);
 
         $response = wp_remote_post($url, $args);
 
-        // Log errors for debugging (non-blocking failures)
         if (is_wp_error($response)) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log(sprintf(
-                    'Call Scheduler Webhook Error: %s',
-                    $response->get_error_message()
-                ));
-            }
+            $this->logError($response->get_error_message());
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Get webhook secret from wp-config.php constant
+     *
+     * Security: Secret is NEVER stored in database to prevent exposure
+     * via SQL injection, backups, or other plugin access.
+     *
+     * @return string Secret key or empty string if not configured
+     */
+    public static function getSecret(): string
+    {
+        if (!defined('CS_WEBHOOK_SECRET') || empty(CS_WEBHOOK_SECRET)) {
+            return '';
+        }
+
+        return CS_WEBHOOK_SECRET;
+    }
+
+    /**
+     * Check if webhook secret is configured
+     */
+    public static function hasSecret(): bool
+    {
+        return !empty(self::getSecret());
     }
 
     /**
@@ -157,5 +187,15 @@ final class Webhook
     {
         $options = get_option('cs_options', []);
         return !empty($options['webhook_enabled']) && !empty($options['webhook_url']);
+    }
+
+    /**
+     * Log error for debugging (only when WP_DEBUG is enabled)
+     */
+    private function logError(string $message): void
+    {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf('Call Scheduler Webhook Error: %s', $message));
+        }
     }
 }

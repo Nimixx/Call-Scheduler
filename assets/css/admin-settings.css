@@ -84,13 +84,25 @@
 }
 
 .cs-form-field .cs-input {
-    width: 100px;
     height: 40px;
     font-size: 15px;
     border: 1px solid #8c8f94;
     border-radius: 4px;
     padding: 0 12px;
+}
+
+.cs-form-field .cs-number-input {
+    width: 100px;
     text-align: center;
+}
+
+.cs-form-field .cs-text-input {
+    width: 100%;
+    max-width: 300px;
+}
+
+.cs-form-field .cs-select-input {
+    width: 150px;
 }
 
 .cs-form-field .cs-input:focus {
@@ -104,11 +116,82 @@
     color: #646970;
 }
 
+/* Toggle Switch - same as availability page */
+.cs-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.cs-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cs-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #dcdcde;
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.cs-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+.cs-toggle input:checked + .cs-toggle-slider {
+    background-color: #2271b1;
+}
+
+.cs-toggle input:checked + .cs-toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.cs-toggle-label {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #1d2327;
+}
+
+/* Conditional Fields */
+.cs-conditional-fields {
+    border-top: 1px solid #f0f0f1;
+    margin-top: 16px;
+    padding-top: 16px;
+}
+
+.cs-conditional-fields .cs-form-row:first-child {
+    padding-top: 0;
+}
+
 /* Settings Footer */
 .cs-settings-footer {
     background: #f6f7f7;
     border-top: 1px solid #dcdcde;
     padding: 15px 20px;
+}
+
+.cs-settings-footer-sticky {
+    position: sticky;
+    bottom: 0;
+    margin: 20px 0 0;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
 }
 
 /* Info Box */
@@ -133,6 +216,13 @@
     flex-shrink: 0;
 }
 
+/* Success notice enhancement */
+.notice-success .dashicons-yes-alt {
+    color: #00a32a;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
 /* Responsive */
 @media (max-width: 782px) {
     .cs-form-row {
@@ -147,6 +237,18 @@
 
     .cs-form-field .cs-input {
         width: 100%;
+        max-width: 100%;
+    }
+
+    .cs-form-field .cs-number-input {
         max-width: 150px;
+    }
+
+    .cs-form-field .cs-text-input {
+        max-width: 100%;
+    }
+
+    .cs-form-field .cs-select-input {
+        width: 100%;
     }
 }

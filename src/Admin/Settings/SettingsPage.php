@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace CallScheduler\Admin\Settings;
 
-use CallScheduler\Config;
+use CallScheduler\Admin\Settings\Modules\SettingsModuleInterface;
+use CallScheduler\Admin\Settings\Modules\TimingModule;
+use CallScheduler\Admin\Settings\Modules\WhitelabelModule;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -12,11 +14,26 @@ if (!defined('ABSPATH')) {
 
 /**
  * Controller for the Settings admin page
+ *
+ * Renders settings using modular architecture - each module handles one settings card.
  */
 final class SettingsPage
 {
     private const OPTION_GROUP = 'cs_settings';
     private const OPTION_NAME = 'cs_options';
+
+    /**
+     * @var SettingsModuleInterface[]
+     */
+    private array $modules = [];
+
+    public function __construct()
+    {
+        $this->modules = [
+            new TimingModule(),
+            new WhitelabelModule(),
+        ];
+    }
 
     public function register(): void
     {
@@ -50,55 +67,66 @@ final class SettingsPage
             [],
             CS_VERSION
         );
+
+        wp_enqueue_script(
+            'cs-admin-settings',
+            CS_PLUGIN_URL . 'assets/js/admin-settings.js',
+            [],
+            CS_VERSION,
+            true
+        );
     }
 
     /**
      * @param mixed $input
-     * @return array<string, int>
+     * @return array<string, mixed>
      */
     public function sanitizeOptions(mixed $input): array
     {
-        $defaults = $this->getDefaults();
-
         if (!is_array($input)) {
-            return $defaults;
+            return $this->getDefaults();
         }
 
         $output = [];
 
-        // Slot duration - must be positive and divide into 60 (or be 90/120)
-        $slot_duration = isset($input['slot_duration']) ? absint($input['slot_duration']) : $defaults['slot_duration'];
-        $valid_durations = [15, 30, 60, 90, 120];
-        $output['slot_duration'] = in_array($slot_duration, $valid_durations, true) ? $slot_duration : $defaults['slot_duration'];
-
-        // Buffer time - must be non-negative and less than slot duration
-        $buffer_time = isset($input['buffer_time']) ? absint($input['buffer_time']) : $defaults['buffer_time'];
-        $output['buffer_time'] = $buffer_time < $output['slot_duration'] ? $buffer_time : 0;
+        // Let each module sanitize its own options
+        foreach ($this->modules as $module) {
+            $moduleOptions = $module->sanitize($input);
+            $output = array_merge($output, $moduleOptions);
+        }
 
         return $output;
     }
 
     /**
-     * @return array<string, int>
+     * @return array<string, mixed>
      */
     private function getDefaults(): array
     {
-        return [
-            'slot_duration' => 60,
-            'buffer_time' => 0,
-        ];
+        $defaults = [];
+
+        foreach ($this->modules as $module) {
+            $defaults = array_merge($defaults, $module->getDefaults());
+        }
+
+        return $defaults;
     }
 
     /**
-     * @return array<string, int>
+     * @return array<string, mixed>
      */
     public static function getOptions(): array
     {
         $options = get_option(self::OPTION_NAME, []);
 
+        // Build defaults from all modules
         $defaults = [
+            // Timing
             'slot_duration' => 60,
             'buffer_time' => 0,
+            // Whitelabel
+            'whitelabel_enabled' => false,
+            'whitelabel_plugin_name' => '',
         ];
 
         return wp_parse_args($options, $defaults);
@@ -107,106 +135,49 @@ final class SettingsPage
     public function render(): void
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('Nemáte dostatečná oprávnění pro přístup na tuto stránku.', 'call-scheduler'));
+            wp_die(__('Nemate dostatecna opravneni pro pristup na tuto stranku.', 'call-scheduler'));
         }
 
         $options = self::getOptions();
         ?>
         <div class="wrap cs-settings-page">
-            <h1><?php echo esc_html__('Nastavení', 'call-scheduler'); ?></h1>
+            <h1><?php echo esc_html__('Nastaveni', 'call-scheduler'); ?></h1>
 
-            <?php if (isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true') : ?>
-                <div class="notice notice-success is-dismissible">
-                    <p>
-                        <span class="dashicons dashicons-yes-alt"></span>
-                        <?php echo esc_html__('Nastavení bylo úspěšně uloženo!', 'call-scheduler'); ?>
-                    </p>
-                </div>
-            <?php endif; ?>
+            <?php $this->renderSuccessNotice(); ?>
 
             <div class="cs-info-box">
                 <p>
                     <span class="dashicons dashicons-info"></span>
-                    <?php echo esc_html__('Nastavení délky rezervací a mezičasu mezi schůzkami.', 'call-scheduler'); ?>
+                    <?php echo esc_html__('Nastaveni pluginu pro rezervace.', 'call-scheduler'); ?>
                 </p>
             </div>
 
             <form method="post" action="options.php">
                 <?php settings_fields(self::OPTION_GROUP); ?>
 
-                <div class="cs-settings-card">
-                    <div class="cs-settings-header">
-                        <h2 class="cs-settings-title">
-                            <span class="dashicons dashicons-clock"></span>
-                            <?php echo esc_html__('Časování rezervací', 'call-scheduler'); ?>
-                        </h2>
-                    </div>
+                <?php foreach ($this->modules as $module): ?>
+                    <?php $module->render($options); ?>
+                <?php endforeach; ?>
 
-                    <div class="cs-settings-body">
-                        <div class="cs-form-row">
-                            <div class="cs-form-label">
-                                <label for="cs_slot_duration">
-                                    <?php echo esc_html__('Délka rezervace', 'call-scheduler'); ?>
-                                </label>
-                                <p class="description">
-                                    <?php echo esc_html__('Jak dlouho trvá jedna schůzka.', 'call-scheduler'); ?>
-                                </p>
-                            </div>
-                            <div class="cs-form-field">
-                                <select
-                                    name="<?php echo esc_attr(self::OPTION_NAME); ?>[slot_duration]"
-                                    id="cs_slot_duration"
-                                    class="cs-input"
-                                    style="width: 150px;"
-                                >
-                                    <?php
-                                    $durations = [
-                                        15 => '15 minut',
-                                        30 => '30 minut',
-                                        60 => '1 hodina',
-                                        90 => '1,5 hodiny',
-                                        120 => '2 hodiny',
-                                    ];
-                                    foreach ($durations as $value => $label) :
-                                        ?>
-                                        <option value="<?php echo esc_attr($value); ?>" <?php selected($options['slot_duration'], $value); ?>>
-                                            <?php echo esc_html($label); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="cs-form-row">
-                            <div class="cs-form-label">
-                                <label for="cs_buffer_time">
-                                    <?php echo esc_html__('Mezičas', 'call-scheduler'); ?>
-                                </label>
-                                <p class="description">
-                                    <?php echo esc_html__('Pauza mezi schůzkami pro přípravu.', 'call-scheduler'); ?>
-                                </p>
-                            </div>
-                            <div class="cs-form-field">
-                                <input
-                                    type="number"
-                                    name="<?php echo esc_attr(self::OPTION_NAME); ?>[buffer_time]"
-                                    id="cs_buffer_time"
-                                    class="cs-input"
-                                    value="<?php echo esc_attr((string) $options['buffer_time']); ?>"
-                                    min="0"
-                                    max="60"
-                                    step="5"
-                                >
-                                <span class="cs-unit"><?php echo esc_html__('minut', 'call-scheduler'); ?></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="cs-settings-footer">
-                        <?php submit_button(__('Uložit nastavení', 'call-scheduler'), 'primary', 'submit', false); ?>
-                    </div>
+                <div class="cs-settings-footer cs-settings-footer-sticky">
+                    <?php submit_button(__('Ulozit nastaveni', 'call-scheduler'), 'primary', 'submit', false); ?>
                 </div>
             </form>
+        </div>
+        <?php
+    }
+
+    private function renderSuccessNotice(): void
+    {
+        if (!isset($_GET['settings-updated']) || $_GET['settings-updated'] !== 'true') {
+            return;
+        }
+        ?>
+        <div class="notice notice-success is-dismissible">
+            <p>
+                <span class="dashicons dashicons-yes-alt"></span>
+                <?php echo esc_html__('Nastaveni bylo uspesne ulozeno!', 'call-scheduler'); ?>
+            </p>
         </div>
         <?php
     }

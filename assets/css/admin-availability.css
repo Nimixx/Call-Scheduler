@@ -1,0 +1,239 @@
+.cs-availability-page {
+    max-width: 1200px;
+}
+
+/* Member Card */
+.cs-member-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-left: 4px solid #2271b1;
+    padding: 0;
+    margin: 20px 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.cs-member-selector {
+    padding: 20px;
+}
+
+.cs-member-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cs-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #50575e;
+    margin: 0;
+}
+
+.cs-label .dashicons {
+    color: #2271b1;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+}
+
+.cs-select {
+    width: 100%;
+    max-width: 400px;
+    height: 44px;
+    font-size: 15px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+}
+
+.cs-select:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: none;
+}
+
+.cs-summary-bar {
+    background: #f6f7f7;
+    border-top: 1px solid #dcdcde;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cs-summary {
+    color: #2271b1;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.cs-summary .dashicons {
+    color: #2271b1;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+}
+
+.cs-summary-empty {
+    color: #646970;
+    font-style: italic;
+}
+
+/* Instructions */
+.cs-instructions {
+    background: #f0f6fc;
+    border-left: 4px solid #72aee6;
+    padding: 12px 16px;
+    margin: 20px 0;
+}
+
+.cs-instructions p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cs-instructions .dashicons {
+    color: #2271b1;
+}
+
+/* Quick Actions */
+.cs-quick-actions {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Table Styles */
+.cs-days-table {
+    margin-top: 20px;
+}
+
+.cs-col-enable {
+    width: 80px;
+    text-align: center;
+}
+
+.cs-col-day {
+    width: 150px;
+}
+
+.cs-col-time {
+    width: 150px;
+}
+
+.cs-col-hours {
+    width: 100px;
+    text-align: center;
+    font-weight: 600;
+    color: #2271b1;
+}
+
+.cs-row-disabled {
+    opacity: 0.5;
+    background: #f6f7f7;
+}
+
+.cs-row-enabled {
+    background: #fff;
+}
+
+.cs-row-disabled .cs-time-input {
+    background: #f0f0f1;
+}
+
+.cs-day-name {
+    font-size: 14px;
+}
+
+.cs-time-input {
+    width: 120px;
+    height: 36px;
+    padding: 0 8px;
+}
+
+/* Toggle Switch */
+.cs-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.cs-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cs-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #dcdcde;
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.cs-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+.cs-toggle input:checked + .cs-toggle-slider {
+    background-color: #2271b1;
+}
+
+.cs-toggle input:checked + .cs-toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* Success notice enhancement */
+.notice-success .dashicons-yes-alt {
+    color: #00a32a;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+    .cs-select {
+        max-width: 100%;
+    }
+
+    .cs-quick-actions {
+        flex-direction: column;
+    }
+
+    .cs-quick-actions .button {
+        width: 100%;
+    }
+
+    .cs-summary-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

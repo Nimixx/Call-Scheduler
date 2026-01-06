@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
  */
 abstract class AbstractSettingsModule implements SettingsModuleInterface
 {
-    protected const OPTION_NAME = 'cs_options';
+    public const OPTION_NAME = 'cs_options';
 
     public function registerSettings(): void
     {
@@ -21,14 +21,32 @@ abstract class AbstractSettingsModule implements SettingsModuleInterface
     }
 
     /**
+     * Generate a unique field ID
+     */
+    protected function getFieldId(string $name): string
+    {
+        return 'cs_' . $name;
+    }
+
+    /**
+     * Get field name for form submission
+     */
+    protected function getFieldName(string $name): string
+    {
+        return self::OPTION_NAME . "[$name]";
+    }
+
+    /**
      * Render a toggle switch
      */
     protected function renderToggle(string $name, bool $checked, string $label = ''): void
     {
-        $field_name = self::OPTION_NAME . "[$name]";
+        $field_id = $this->getFieldId($name);
+        $field_name = $this->getFieldName($name);
         ?>
-        <label class="cs-toggle">
+        <label class="cs-toggle" for="<?php echo esc_attr($field_id); ?>">
             <input type="checkbox"
+                   id="<?php echo esc_attr($field_id); ?>"
                    name="<?php echo esc_attr($field_name); ?>"
                    value="1"
                    <?php checked($checked); ?>
@@ -46,9 +64,11 @@ abstract class AbstractSettingsModule implements SettingsModuleInterface
      */
     protected function renderTextInput(string $name, string $value, string $placeholder = ''): void
     {
-        $field_name = self::OPTION_NAME . "[$name]";
+        $field_id = $this->getFieldId($name);
+        $field_name = $this->getFieldName($name);
         ?>
         <input type="text"
+               id="<?php echo esc_attr($field_id); ?>"
                name="<?php echo esc_attr($field_name); ?>"
                class="cs-input cs-text-input"
                value="<?php echo esc_attr($value); ?>"
@@ -61,9 +81,11 @@ abstract class AbstractSettingsModule implements SettingsModuleInterface
      */
     protected function renderNumberInput(string $name, int $value, int $min = 0, int $max = 100, int $step = 1): void
     {
-        $field_name = self::OPTION_NAME . "[$name]";
+        $field_id = $this->getFieldId($name);
+        $field_name = $this->getFieldName($name);
         ?>
         <input type="number"
+               id="<?php echo esc_attr($field_id); ?>"
                name="<?php echo esc_attr($field_name); ?>"
                class="cs-input cs-number-input"
                value="<?php echo esc_attr((string) $value); ?>"
@@ -80,9 +102,10 @@ abstract class AbstractSettingsModule implements SettingsModuleInterface
      */
     protected function renderSelect(string $name, mixed $value, array $options): void
     {
-        $field_name = self::OPTION_NAME . "[$name]";
+        $field_id = $this->getFieldId($name);
+        $field_name = $this->getFieldName($name);
         ?>
-        <select name="<?php echo esc_attr($field_name); ?>" class="cs-input cs-select-input">
+        <select id="<?php echo esc_attr($field_id); ?>" name="<?php echo esc_attr($field_name); ?>" class="cs-input cs-select-input">
             <?php foreach ($options as $option_value => $option_label): ?>
                 <option value="<?php echo esc_attr((string) $option_value); ?>" <?php selected($value, $option_value); ?>>
                     <?php echo esc_html($option_label); ?>
@@ -121,14 +144,19 @@ abstract class AbstractSettingsModule implements SettingsModuleInterface
     }
 
     /**
-     * Render a form row
+     * Render a form row with label
+     *
+     * @param string $name Field name (used for label 'for' attribute)
+     * @param string $label Label text
+     * @param string $description Optional description
      */
-    protected function renderFormRowStart(string $label, string $description = ''): void
+    protected function renderFormRowStart(string $name, string $label, string $description = ''): void
     {
+        $field_id = $this->getFieldId($name);
         ?>
         <div class="cs-form-row">
             <div class="cs-form-label">
-                <label><?php echo esc_html($label); ?></label>
+                <label for="<?php echo esc_attr($field_id); ?>"><?php echo esc_html($label); ?></label>
                 <?php if ($description): ?>
                     <p class="description"><?php echo esc_html($description); ?></p>
                 <?php endif; ?>

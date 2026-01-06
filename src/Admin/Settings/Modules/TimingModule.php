@@ -20,7 +20,7 @@ final class TimingModule extends AbstractSettingsModule
 
     public function getTitle(): string
     {
-        return __('Casovani rezervaci', 'call-scheduler');
+        return __('Časování rezervací', 'call-scheduler');
     }
 
     public function getIcon(): string
@@ -59,16 +59,17 @@ final class TimingModule extends AbstractSettingsModule
 
         // Slot Duration
         $this->renderFormRowStart(
-            __('Delka rezervace', 'call-scheduler'),
-            __('Jak dlouho trva jedna schuzka.', 'call-scheduler')
+            'slot_duration',
+            __('Délka rezervace', 'call-scheduler'),
+            __('Jak dlouho trvá jedna schůzka.', 'call-scheduler')
         );
 
         $durations = [
-            15 => '15 minut',
-            30 => '30 minut',
-            60 => '1 hodina',
-            90 => '1,5 hodiny',
-            120 => '2 hodiny',
+            15 => __('15 minut', 'call-scheduler'),
+            30 => __('30 minut', 'call-scheduler'),
+            60 => __('1 hodina', 'call-scheduler'),
+            90 => __('1,5 hodiny', 'call-scheduler'),
+            120 => __('2 hodiny', 'call-scheduler'),
         ];
         $this->renderSelect('slot_duration', $options['slot_duration'] ?? 60, $durations);
 
@@ -76,8 +77,9 @@ final class TimingModule extends AbstractSettingsModule
 
         // Buffer Time
         $this->renderFormRowStart(
-            __('Mezicas', 'call-scheduler'),
-            __('Pauza mezi schuzkami pro pripravu.', 'call-scheduler')
+            'buffer_time',
+            __('Mezičas', 'call-scheduler'),
+            __('Pauza mezi schůzkami pro přípravu.', 'call-scheduler')
         );
 
         $this->renderNumberInput('buffer_time', (int) ($options['buffer_time'] ?? 0), 0, 60, 5);

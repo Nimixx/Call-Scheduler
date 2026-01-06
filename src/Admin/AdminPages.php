@@ -36,7 +36,7 @@ final class AdminPages
 
         // Main menu page - Bookings list
         add_menu_page(
-            __('Vsechny rezervace', 'call-scheduler'),   // Page title
+            __('Všechny rezervace', 'call-scheduler'),   // Page title
             $plugin_name,                                      // Menu title (whitelabel)
             'manage_options',                                  // Capability
             'cs-bookings',                                     // Menu slug
@@ -58,8 +58,8 @@ final class AdminPages
         // Submenu page - Settings
         add_submenu_page(
             'cs-bookings',                                     // Parent slug
-            __('Nastaveni', 'call-scheduler'),           // Page title
-            __('Nastaveni', 'call-scheduler'),           // Menu title
+            __('Nastavení', 'call-scheduler'),           // Page title
+            __('Nastavení', 'call-scheduler'),           // Menu title
             'manage_options',                                  // Capability
             'cs-settings',                                     // Menu slug
             [$settingsPage, 'render']                          // Callback
@@ -68,7 +68,7 @@ final class AdminPages
         // Rename first submenu item to "All Bookings"
         global $submenu;
         if (isset($submenu['cs-bookings'][0])) {
-            $submenu['cs-bookings'][0][0] = __('Vsechny rezervace', 'call-scheduler');
+            $submenu['cs-bookings'][0][0] = __('Všechny rezervace', 'call-scheduler');
         }
     }
 }

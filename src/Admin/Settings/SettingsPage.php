@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CallScheduler\Admin\Settings;
 
+use CallScheduler\Admin\Settings\Modules\AbstractSettingsModule;
 use CallScheduler\Admin\Settings\Modules\SettingsModuleInterface;
 use CallScheduler\Admin\Settings\Modules\TimingModule;
 use CallScheduler\Admin\Settings\Modules\WhitelabelModule;
@@ -20,7 +21,6 @@ if (!defined('ABSPATH')) {
 final class SettingsPage
 {
     private const OPTION_GROUP = 'cs_settings';
-    private const OPTION_NAME = 'cs_options';
 
     /**
      * @var SettingsModuleInterface[]
@@ -45,7 +45,7 @@ final class SettingsPage
     {
         register_setting(
             self::OPTION_GROUP,
-            self::OPTION_NAME,
+            AbstractSettingsModule::OPTION_NAME,
             [
                 'type' => 'array',
                 'sanitize_callback' => [$this, 'sanitizeOptions'],
@@ -117,7 +117,7 @@ final class SettingsPage
      */
     public static function getOptions(): array
     {
-        $options = get_option(self::OPTION_NAME, []);
+        $options = get_option(AbstractSettingsModule::OPTION_NAME, []);
 
         // Build defaults from all modules
         $defaults = [
@@ -135,20 +135,20 @@ final class SettingsPage
     public function render(): void
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('Nemate dostatecna opravneni pro pristup na tuto stranku.', 'call-scheduler'));
+            wp_die(esc_html__('Nemáte dostatečná oprávnění pro přístup na tuto stránku.', 'call-scheduler'));
         }
 
         $options = self::getOptions();
         ?>
         <div class="wrap cs-settings-page">
-            <h1><?php echo esc_html__('Nastaveni', 'call-scheduler'); ?></h1>
+            <h1><?php esc_html_e('Nastavení', 'call-scheduler'); ?></h1>
 
-            <?php $this->renderSuccessNotice(); ?>
+            <?php settings_errors(); ?>
 
             <div class="cs-info-box">
                 <p>
                     <span class="dashicons dashicons-info"></span>
-                    <?php echo esc_html__('Nastaveni pluginu pro rezervace.', 'call-scheduler'); ?>
+                    <?php esc_html_e('Nastavení pluginu pro rezervace.', 'call-scheduler'); ?>
                 </p>
             </div>
 
@@ -160,24 +160,9 @@ final class SettingsPage
                 <?php endforeach; ?>
 
                 <div class="cs-settings-footer cs-settings-footer-sticky">
-                    <?php submit_button(__('Ulozit nastaveni', 'call-scheduler'), 'primary', 'submit', false); ?>
+                    <?php submit_button(__('Uložit nastavení', 'call-scheduler'), 'primary', 'submit', false); ?>
                 </div>
             </form>
-        </div>
-        <?php
-    }
-
-    private function renderSuccessNotice(): void
-    {
-        if (!isset($_GET['settings-updated']) || $_GET['settings-updated'] !== 'true') {
-            return;
-        }
-        ?>
-        <div class="notice notice-success is-dismissible">
-            <p>
-                <span class="dashicons dashicons-yes-alt"></span>
-                <?php echo esc_html__('Nastaveni bylo uspesne ulozeno!', 'call-scheduler'); ?>
-            </p>
         </div>
         <?php
     }

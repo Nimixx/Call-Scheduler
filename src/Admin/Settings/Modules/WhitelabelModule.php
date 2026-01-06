@@ -58,8 +58,9 @@ final class WhitelabelModule extends AbstractSettingsModule
 
         // Enable toggle row
         $this->renderFormRowStart(
+            'whitelabel_enabled',
             __('Povolit whitelabel', 'call-scheduler'),
-            __('Prejmenujte plugin pro vaseho zakaznika.', 'call-scheduler')
+            __('Přejmenujte plugin pro vašeho zákazníka.', 'call-scheduler')
         );
         $this->renderToggle('whitelabel_enabled', $is_enabled);
         $this->renderFormRowEnd();
@@ -69,7 +70,8 @@ final class WhitelabelModule extends AbstractSettingsModule
         <div class="cs-conditional-fields" data-depends-on="whitelabel_enabled" <?php echo $is_enabled ? '' : 'style="display: none;"'; ?>>
             <?php
             $this->renderFormRowStart(
-                __('Nazev pluginu', 'call-scheduler'),
+                'whitelabel_plugin_name',
+                __('Název pluginu', 'call-scheduler'),
                 __('Zobrazuje se v menu administrace.', 'call-scheduler')
             );
             $this->renderTextInput('whitelabel_plugin_name', $plugin_name, __('Rezervace', 'call-scheduler'));
@@ -86,7 +88,7 @@ final class WhitelabelModule extends AbstractSettingsModule
      */
     public static function getPluginName(): string
     {
-        $options = get_option('cs_options', []);
+        $options = get_option(self::OPTION_NAME, []);
 
         if (!empty($options['whitelabel_enabled']) && !empty($options['whitelabel_plugin_name'])) {
             return $options['whitelabel_plugin_name'];

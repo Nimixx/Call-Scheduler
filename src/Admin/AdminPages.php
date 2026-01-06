@@ -6,6 +6,8 @@ namespace CallScheduler\Admin;
 
 use CallScheduler\Admin\Availability\AvailabilityPage;
 use CallScheduler\Admin\Bookings\BookingsPage;
+use CallScheduler\Admin\Settings\SettingsPage;
+use CallScheduler\Admin\Settings\Modules\WhitelabelModule;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -22,15 +24,20 @@ final class AdminPages
     {
         $bookingsPage = new BookingsPage();
         $availabilityPage = new AvailabilityPage();
+        $settingsPage = new SettingsPage();
 
         // Register hooks for asset enqueuing
         $bookingsPage->register();
         $availabilityPage->register();
+        $settingsPage->register();
+
+        // Get plugin name (whitelabel or default)
+        $plugin_name = WhitelabelModule::getPluginName();
 
         // Main menu page - Bookings list
         add_menu_page(
             __('Všechny rezervace', 'call-scheduler'),   // Page title
-            __('Rezervace', 'call-scheduler'),           // Menu title
+            $plugin_name,                                      // Menu title (whitelabel)
             'manage_options',                                  // Capability
             'cs-bookings',                                     // Menu slug
             [$bookingsPage, 'render'],                         // Callback
@@ -46,6 +53,16 @@ final class AdminPages
             'manage_options',                                  // Capability
             'cs-availability',                                 // Menu slug
             [$availabilityPage, 'render']                      // Callback
+        );
+
+        // Submenu page - Settings
+        add_submenu_page(
+            'cs-bookings',                                     // Parent slug
+            __('Nastavení', 'call-scheduler'),           // Page title
+            __('Nastavení', 'call-scheduler'),           // Menu title
+            'manage_options',                                  // Capability
+            'cs-settings',                                     // Menu slug
+            [$settingsPage, 'render']                          // Callback
         );
 
         // Rename first submenu item to "All Bookings"

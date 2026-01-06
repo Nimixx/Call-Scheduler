@@ -102,6 +102,7 @@ final class Plugin
             new Rest\TeamMembersController(),
             new Rest\AvailabilityController(),
             new Rest\BookingsController(),
+            new Rest\SettingsController(),
         ];
 
         foreach ($controllers as $controller) {

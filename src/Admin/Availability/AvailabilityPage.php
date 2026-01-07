@@ -39,8 +39,8 @@ final class AvailabilityPage
         }
 
         wp_enqueue_style(
-            'cs-admin-availability',
-            CS_PLUGIN_URL . 'assets/css/admin-availability.css',
+            'cs-admin',
+            CS_PLUGIN_URL . 'assets/css/admin.css',
             [],
             CS_VERSION
         );

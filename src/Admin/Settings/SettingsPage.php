@@ -64,8 +64,8 @@ final class SettingsPage
         }
 
         wp_enqueue_style(
-            'cs-admin-settings',
-            CS_PLUGIN_URL . 'assets/css/admin-settings.css',
+            'cs-admin',
+            CS_PLUGIN_URL . 'assets/css/admin.css',
             [],
             CS_VERSION
         );

@@ -37,8 +37,8 @@ final class BookingsPage
         }
 
         wp_enqueue_style(
-            'cs-admin-bookings',
-            CS_PLUGIN_URL . 'assets/css/admin-bookings.css',
+            'cs-admin',
+            CS_PLUGIN_URL . 'assets/css/admin.css',
             [],
             CS_VERSION
         );

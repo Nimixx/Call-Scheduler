@@ -1,0 +1,34 @@
+/**
+ * Call Scheduler - Admin Styles
+ * Main CSS file - imports all component and page styles
+ *
+ * Structure:
+ * 1. Base - Variables, typography, global styles
+ * 2. Components - Reusable UI components
+ * 3. Pages - Page-specific styles
+ */
+
+/* =========================================
+   BASE - Design Tokens & Global Styles
+   ========================================= */
+@import url('./base/variables.css');
+@import url('./base/typography.css');
+@import url('./base/global.css');
+
+/* =========================================
+   COMPONENTS - Reusable UI Components
+   ========================================= */
+@import url('./components/buttons.css');
+@import url('./components/widgets.css');
+@import url('./components/cards.css');
+@import url('./components/toggle.css');
+@import url('./components/forms.css');
+@import url('./components/table.css');
+
+/* =========================================
+   PAGES - Page-Specific Styles
+   ========================================= */
+@import url('./pages/dashboard.css');
+@import url('./pages/availability.css');
+@import url('./pages/bookings.css');
+@import url('./pages/settings.css');

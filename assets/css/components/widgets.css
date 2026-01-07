@@ -1,0 +1,84 @@
+/**
+ * Call Scheduler - Widget Component
+ * Dashboard overview widgets
+ */
+
+.cs-dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--cs-space-lg);
+    margin-bottom: var(--cs-space-xl);
+}
+
+.cs-widget {
+    background: #fff;
+    border: 1px solid var(--cs-color-border);
+    border-radius: var(--cs-radius-xl);
+}
+
+.cs-widget-inner {
+    padding: var(--cs-space-3xl) var(--cs-space-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.cs-widget-number {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: var(--cs-space-md);
+    color: var(--cs-color-text-dark);
+}
+
+/* Widget Status Colors */
+.cs-widget-pending .cs-widget-number {
+    color: var(--cs-status-pending);
+}
+
+.cs-widget-confirmed .cs-widget-number {
+    color: var(--cs-status-confirmed);
+}
+
+.cs-widget-total .cs-widget-number {
+    color: var(--cs-status-cancelled);
+}
+
+.cs-widget-label {
+    font-size: var(--cs-font-size-sm);
+    color: var(--cs-color-text-muted);
+    margin-bottom: var(--cs-space-lg);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.cs-widget-action {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .cs-dashboard-widgets {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .cs-dashboard-widgets {
+        grid-template-columns: 1fr;
+        gap: var(--cs-space-md);
+    }
+
+    .cs-widget-inner {
+        padding: var(--cs-space-2xl) var(--cs-space-lg);
+    }
+
+    .cs-widget-number {
+        font-size: 36px;
+    }
+
+    .cs-widget-label {
+        font-size: var(--cs-font-size-xs);
+    }
+}

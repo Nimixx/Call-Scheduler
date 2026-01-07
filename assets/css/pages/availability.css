@@ -1,0 +1,8 @@
+/**
+ * Call Scheduler - Availability Page Styles
+ * Availability management specific styles
+ */
+
+.cs-availability-page {
+    max-width: var(--cs-max-width);
+}

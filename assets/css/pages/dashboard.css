@@ -1,0 +1,8 @@
+/**
+ * Call Scheduler - Dashboard Page Styles
+ * Dashboard-specific styles and layouts
+ */
+
+.cs-dashboard-page h1 {
+    margin-bottom: var(--cs-space-2xl);
+}

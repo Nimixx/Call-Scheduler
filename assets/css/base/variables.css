@@ -1,0 +1,69 @@
+/**
+ * Call Scheduler - CSS Variables
+ * Design tokens for consistent theming across the plugin
+ */
+
+:root {
+    /* Colors - Primary */
+    --cs-primary: #0073aa;
+    --cs-primary-hover: #005a87;
+    --cs-primary-active: #004578;
+
+    /* Colors - Status */
+    --cs-status-pending: #ea580c;
+    --cs-status-confirmed: #0073aa;
+    --cs-status-cancelled: #646970;
+
+    /* Colors - Neutral */
+    --cs-color-text-dark: #1d2327;
+    --cs-color-text-light: #646970;
+    --cs-color-text-muted: #757575;
+    --cs-color-bg-light: #f6f7f7;
+    --cs-color-border: #e5e7eb;
+    --cs-color-border-light: #dcdcde;
+
+    /* Colors - WordPress */
+    --wp-admin-blue: #2271b1;
+    --wp-admin-blue-light: #72aee6;
+    --wp-admin-blue-bg: #f0f6fc;
+    --wp-admin-gray-border: #c3c4c7;
+
+    /* Colors - Success */
+    --cs-color-success: #00a32a;
+
+    /* Spacing */
+    --cs-space-xs: 4px;
+    --cs-space-sm: 8px;
+    --cs-space-md: 12px;
+    --cs-space-lg: 16px;
+    --cs-space-xl: 20px;
+    --cs-space-2xl: 24px;
+    --cs-space-3xl: 28px;
+
+    /* Typography */
+    --cs-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --cs-font-size-xs: 12px;
+    --cs-font-size-sm: 13px;
+    --cs-font-size-base: 14px;
+    --cs-font-size-lg: 15px;
+    --cs-font-size-xl: 42px;
+
+    /* Border Radius */
+    --cs-radius-sm: 3px;
+    --cs-radius-md: 4px;
+    --cs-radius-lg: 6px;
+    --cs-radius-xl: 8px;
+
+    /* Shadows */
+    --cs-shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.04);
+    --cs-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --cs-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    /* Transitions */
+    --cs-transition-fast: 0.2s ease;
+    --cs-transition-normal: 0.3s ease;
+
+    /* Layout */
+    --cs-max-width: 1200px;
+    --cs-max-width-form: 800px;
+}

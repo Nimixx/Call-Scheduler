@@ -1,0 +1,97 @@
+/**
+ * Call Scheduler - Table Component
+ * Availability and other list table styles
+ */
+
+/* Days Table */
+.cs-days-table {
+    margin-top: var(--cs-space-xl);
+}
+
+/* Table Columns */
+.cs-col-enable {
+    width: 80px;
+    text-align: center;
+}
+
+.cs-col-day {
+    width: 150px;
+}
+
+.cs-col-time {
+    width: 150px;
+}
+
+.cs-col-hours {
+    width: 100px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--wp-admin-blue);
+}
+
+/* Row States */
+.cs-row-disabled {
+    opacity: 0.5;
+    background: var(--cs-color-bg-light);
+}
+
+.cs-row-enabled {
+    background: #fff;
+}
+
+.cs-row-disabled .cs-time-input {
+    background: #f0f0f1;
+}
+
+/* Row Content */
+.cs-day-name {
+    font-size: var(--cs-font-size-base);
+}
+
+.cs-time-input {
+    width: 120px;
+    height: 36px;
+    padding: 0 var(--cs-space-sm);
+}
+
+/* Status Badge */
+.cs-status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: var(--cs-radius-sm);
+    color: #fff;
+    font-size: var(--cs-font-size-xs);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.cs-status-badge.pending {
+    background-color: var(--cs-status-pending);
+}
+
+.cs-status-badge.confirmed {
+    background-color: var(--cs-status-confirmed);
+}
+
+.cs-status-badge.cancelled {
+    background-color: var(--cs-status-cancelled);
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+    .cs-col-enable {
+        width: 60px;
+    }
+
+    .cs-col-day {
+        width: 120px;
+    }
+
+    .cs-col-time {
+        width: 100px;
+    }
+
+    .cs-col-hours {
+        width: 80px;
+    }
+}

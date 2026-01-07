@@ -1,0 +1,55 @@
+/**
+ * Call Scheduler - Toggle Component
+ * Reusable toggle/checkbox switch
+ */
+
+.cs-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.cs-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cs-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--cs-color-border-light);
+    transition: var(--cs-transition-normal);
+    border-radius: 24px;
+}
+
+.cs-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: var(--cs-transition-normal);
+    border-radius: 50%;
+}
+
+.cs-toggle input:checked + .cs-toggle-slider {
+    background-color: var(--wp-admin-blue);
+}
+
+.cs-toggle input:checked + .cs-toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.cs-toggle-label {
+    margin-left: var(--cs-space-lg);
+    font-size: var(--cs-font-size-base);
+    color: var(--cs-color-text-dark);
+}

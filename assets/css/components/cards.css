@@ -1,0 +1,135 @@
+/**
+ * Call Scheduler - Card Component
+ * Reusable card styles for settings, member info, etc.
+ */
+
+/* Base Card */
+.cs-card {
+    background: #fff;
+    border: 1px solid var(--wp-admin-gray-border);
+    border-left: 4px solid var(--wp-admin-blue);
+    padding: 0;
+    margin: var(--cs-space-xl) 0;
+    box-shadow: var(--cs-shadow-sm);
+}
+
+/* Settings Card */
+.cs-settings-card {
+    background: #fff;
+    border: 1px solid var(--wp-admin-gray-border);
+    border-left: 4px solid var(--wp-admin-blue);
+    padding: 0;
+    margin: var(--cs-space-xl) 0;
+    box-shadow: var(--cs-shadow-sm);
+}
+
+.cs-settings-header {
+    padding: var(--cs-space-xl);
+    border-bottom: 1px solid var(--cs-color-border-light);
+}
+
+.cs-settings-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-sm);
+    font-size: var(--cs-font-size-base);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--cs-color-text-dark);
+    margin: 0;
+}
+
+.cs-settings-title .dashicons {
+    color: var(--wp-admin-blue);
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+}
+
+.cs-settings-body {
+    padding: var(--cs-space-xl);
+}
+
+.cs-settings-footer {
+    background: var(--cs-color-bg-light);
+    border-top: 1px solid var(--cs-color-border-light);
+    padding: var(--cs-space-lg) var(--cs-space-xl);
+}
+
+.cs-settings-footer-sticky {
+    position: sticky;
+    bottom: 0;
+    margin: var(--cs-space-xl) 0 0;
+    border: 1px solid var(--cs-color-border-light);
+    border-radius: var(--cs-radius-lg);
+}
+
+/* Member Card */
+.cs-member-card {
+    background: #fff;
+    border: 1px solid var(--wp-admin-gray-border);
+    border-left: 4px solid var(--wp-admin-blue);
+    padding: 0;
+    margin: var(--cs-space-xl) 0;
+    box-shadow: var(--cs-shadow-sm);
+}
+
+.cs-member-selector {
+    padding: var(--cs-space-xl);
+}
+
+.cs-member-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-sm);
+}
+
+.cs-label {
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-sm);
+    font-weight: 600;
+    font-size: var(--cs-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--cs-color-text-dark);
+    margin: 0;
+}
+
+.cs-label .dashicons {
+    color: var(--wp-admin-blue);
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+}
+
+.cs-summary-bar {
+    background: var(--cs-color-bg-light);
+    border-top: 1px solid var(--cs-color-border-light);
+    padding: var(--cs-space-md) var(--cs-space-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cs-summary {
+    color: var(--wp-admin-blue);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-sm);
+    font-size: var(--cs-font-size-base);
+}
+
+.cs-summary .dashicons {
+    color: var(--wp-admin-blue);
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+}
+
+.cs-summary-empty {
+    color: var(--cs-color-text-light);
+    font-style: italic;
+}

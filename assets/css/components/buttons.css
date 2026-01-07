@@ -1,0 +1,57 @@
+/**
+ * Call Scheduler - Button Component
+ * Reusable button styles
+ */
+
+/* Dashboard Button */
+.cs-dashboard-btn {
+    display: block;
+    width: 100%;
+    padding: var(--cs-space-md) var(--cs-space-lg);
+    font-size: var(--cs-font-size-sm);
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    background-color: var(--cs-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--cs-radius-lg);
+    cursor: pointer;
+    transition: background-color var(--cs-transition-fast);
+    box-sizing: border-box;
+}
+
+.cs-dashboard-btn:hover {
+    background-color: var(--cs-primary-hover);
+    color: #fff;
+    text-decoration: none;
+}
+
+.cs-dashboard-btn:active {
+    background-color: var(--cs-primary-active);
+    color: #fff;
+}
+
+/* Primary Button (WordPress Default) */
+.button-primary {
+    background-color: var(--wp-admin-blue);
+    border-color: var(--wp-admin-blue);
+    color: #fff;
+}
+
+.button-primary:hover {
+    background-color: #1d5aa8;
+    border-color: #1d5aa8;
+}
+
+/* Button Group */
+.cs-button-group {
+    display: flex;
+    gap: var(--cs-space-sm);
+    flex-wrap: wrap;
+}
+
+.cs-button-group .button {
+    flex: 1;
+    min-width: 120px;
+}

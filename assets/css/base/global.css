@@ -1,0 +1,66 @@
+/**
+ * Call Scheduler - Global Styles
+ * Base styles for all admin pages
+ */
+
+.wrap.cs-dashboard-page,
+.wrap.cs-availability-page,
+.wrap.cs-settings-page {
+    max-width: var(--cs-max-width);
+}
+
+.wrap.cs-settings-page {
+    max-width: var(--cs-max-width-form);
+}
+
+/* WordPress Admin Notice Enhancements */
+.notice {
+    margin: var(--cs-space-xl) 0;
+}
+
+.notice-success .dashicons-yes-alt {
+    color: var(--cs-color-success);
+    vertical-align: middle;
+    margin-right: var(--cs-space-md);
+}
+
+/* Section Info Box */
+.cs-info-box {
+    background: var(--wp-admin-blue-bg);
+    border-left: 4px solid var(--wp-admin-blue-light);
+    padding: var(--cs-space-md) var(--cs-space-lg);
+    margin: var(--cs-space-xl) 0;
+}
+
+.cs-info-box p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-sm);
+    font-size: var(--cs-font-size-sm);
+    color: var(--cs-color-text-dark);
+}
+
+.cs-info-box .dashicons {
+    color: var(--wp-admin-blue);
+    flex-shrink: 0;
+}
+
+/* Instructions Box */
+.cs-instructions {
+    background: var(--wp-admin-blue-bg);
+    border-left: 4px solid var(--wp-admin-blue-light);
+    padding: var(--cs-space-md) var(--cs-space-lg);
+    margin: var(--cs-space-xl) 0;
+}
+
+.cs-instructions p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--cs-space-sm);
+}
+
+.cs-instructions .dashicons {
+    color: var(--wp-admin-blue);
+}

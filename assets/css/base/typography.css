@@ -1,0 +1,72 @@
+/**
+ * Call Scheduler - Typography
+ * Consistent font sizes, weights, and text styling
+ */
+
+html {
+    font-family: var(--cs-font-family);
+}
+
+/* Page Headings */
+h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: var(--cs-space-2xl);
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: var(--cs-space-xl);
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--cs-space-lg);
+}
+
+/* Body Text */
+p {
+    font-size: var(--cs-font-size-base);
+    line-height: 1.6;
+    color: var(--cs-color-text-dark);
+}
+
+/* Labels and Small Text */
+label {
+    font-size: var(--cs-font-size-sm);
+    font-weight: 500;
+    color: var(--cs-color-text-dark);
+}
+
+.text-muted {
+    color: var(--cs-color-text-light);
+    font-size: var(--cs-font-size-sm);
+}
+
+/* Links */
+a {
+    color: var(--cs-primary);
+    text-decoration: none;
+    transition: color var(--cs-transition-fast);
+}
+
+a:hover {
+    color: var(--cs-primary-hover);
+}
+
+/* Description Text */
+.description {
+    font-size: var(--cs-font-size-xs);
+    color: var(--cs-color-text-light);
+    margin: 0;
+}
+
+/* Uppercase Text */
+.text-uppercase {
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: 600;
+    font-size: var(--cs-font-size-xs);
+}

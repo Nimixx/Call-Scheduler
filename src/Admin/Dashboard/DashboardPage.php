@@ -57,16 +57,79 @@ final class DashboardPage
         }
 
         $counts = $this->repository->countByStatus();
+
+        // Validate data structure before transformation
+        if (!$this->isValidStatsStructure($counts)) {
+            $this->logDataIntegrityWarning($counts);
+        }
+
         $stats = $this->transformStats($counts);
         $this->renderer->renderPage($stats);
     }
 
     /**
+     * Validate that stats array has expected structure and types
+     *
+     * Expected structure:
+     * - 'all': integer >= 0
+     * - 'pending': integer >= 0
+     * - 'confirmed': integer >= 0
+     * - 'cancelled': integer >= 0
+     *
+     * @param mixed $counts Data to validate
+     * @return bool True if structure is valid, false otherwise
+     */
+    private function isValidStatsStructure(mixed $counts): bool
+    {
+        // Must be array
+        if (!is_array($counts)) {
+            return false;
+        }
+
+        $required_keys = ['all', BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED];
+
+        // Check all required keys exist
+        foreach ($required_keys as $key) {
+            if (!isset($counts[$key])) {
+                return false;
+            }
+
+            // Values must be integers or numeric
+            if (!is_int($counts[$key]) && !is_numeric($counts[$key])) {
+                return false;
+            }
+
+            // Values must be >= 0
+            if ((int) $counts[$key] < 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Log warning when stats data structure is invalid
+     *
+     * @param mixed $counts Invalid data for debugging
+     * @return void
+     */
+    private function logDataIntegrityWarning(mixed $counts): void
+    {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf(
+                'Call Scheduler Dashboard: Invalid stats structure received from countByStatus(). Got: %s',
+                wp_json_encode($counts)
+            ));
+        }
+    }
+
+    /**
      * Transform BookingsRepository counts format to dashboard format
      *
-     * Validates structure and provides safe defaults for missing keys.
+     * Validates structure and provides safe defaults for missing/invalid keys.
      *
-     * @param array $counts Expected keys: all, pending, confirmed, cancelled
+     * @param array $counts Expected keys: all, pending, confirmed, cancelled (integers)
      * @return array{total: int, pending: int, confirmed: int, cancelled: int}
      */
     private function transformStats(array $counts): array

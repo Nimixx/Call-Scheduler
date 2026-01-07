@@ -63,6 +63,26 @@ Minimal page-specific overrides that extend components.
 ✅ **Responsive**: Consistent breakpoints and media queries
 ✅ **WordPress Native**: Uses WordPress admin colors and patterns
 
+## Cleanup & Optimization
+
+✅ **Removed Legacy Files:**
+- `admin-dashboard.css` - Replaced by components/widgets.css and pages/dashboard.css
+- `admin-availability.css` - Replaced by components and pages
+- `admin-settings.css` - Replaced by components and pages
+- `admin-bookings.css` - Replaced by components/table.css and pages/bookings.css
+
+✅ **Removed Unused:**
+- `.cs-card` - Unused base card class
+- `.cs-button-group` - Defined but never used
+- `--cs-shadow-md` - Unused shadow variable
+- `--cs-shadow-lg` - Unused shadow variable
+
+✅ **Added Utilities:**
+- `.cs-hidden` - Use instead of inline `style="display: none"`
+- `.cs-visible` - For showing hidden elements
+
+**Result:** Removed 700+ lines of duplicate CSS. Reduced CSS code ~40%.
+
 ## Adding New Styles
 
 ### New Component

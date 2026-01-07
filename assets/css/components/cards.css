@@ -3,16 +3,6 @@
  * Reusable card styles for settings, member info, etc.
  */
 
-/* Base Card */
-.cs-card {
-    background: #fff;
-    border: 1px solid var(--wp-admin-gray-border);
-    border-left: 4px solid var(--wp-admin-blue);
-    padding: 0;
-    margin: var(--cs-space-xl) 0;
-    box-shadow: var(--cs-shadow-sm);
-}
-
 /* Settings Card */
 .cs-settings-card {
     background: #fff;

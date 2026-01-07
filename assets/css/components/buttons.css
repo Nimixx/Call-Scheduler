@@ -43,15 +43,3 @@
     background-color: #1d5aa8;
     border-color: #1d5aa8;
 }
-
-/* Button Group */
-.cs-button-group {
-    display: flex;
-    gap: var(--cs-space-sm);
-    flex-wrap: wrap;
-}
-
-.cs-button-group .button {
-    flex: 1;
-    min-width: 120px;
-}

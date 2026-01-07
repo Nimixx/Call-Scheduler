@@ -64,3 +64,12 @@
 .cs-instructions .dashicons {
     color: var(--wp-admin-blue);
 }
+
+/* Utility Classes */
+.cs-hidden {
+    display: none !important;
+}
+
+.cs-visible {
+    display: block !important;
+}

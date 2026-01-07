@@ -369,6 +369,23 @@ final class BookingsRepository
         return $wpdb->get_var($query) === $table;
     }
 
+    /**
+     * Build WHERE clause from conditions array
+     *
+     * Shared helper to eliminate duplicate WHERE clause construction.
+     *
+     * @param array<string> $conditions Array of prepared SQL conditions
+     * @return string WHERE clause or empty string if no conditions
+     */
+    private function buildWhereFromConditions(array $conditions): string
+    {
+        if (empty($conditions)) {
+            return '';
+        }
+
+        return 'WHERE ' . implode(' AND ', $conditions);
+    }
+
     private function buildWhereClause(
         ?string $status,
         ?string $dateFrom,
@@ -390,11 +407,7 @@ final class BookingsRepository
             $conditions[] = $wpdb->prepare('b.booking_date <= %s', $dateTo);
         }
 
-        if (empty($conditions)) {
-            return '';
-        }
-
-        return 'WHERE ' . implode(' AND ', $conditions);
+        return $this->buildWhereFromConditions($conditions);
     }
 
     private function buildWhereClauseForUser(
@@ -413,7 +426,7 @@ final class BookingsRepository
             $conditions[] = $wpdb->prepare('b.status = %s', $status);
         }
 
-        return 'WHERE ' . implode(' AND ', $conditions);
+        return $this->buildWhereFromConditions($conditions);
     }
 
     public function getPerPage(): int

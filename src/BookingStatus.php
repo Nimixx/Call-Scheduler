@@ -68,15 +68,17 @@ final class BookingStatus
 
     /**
      * Get color for status badge
+     *
+     * Matches CSS variables in assets/css/base/variables.css
      */
     public static function color(string $status): string
     {
         $colors = [
-            self::PENDING => '#dba617',
-            self::CONFIRMED => '#00a32a',
-            self::CANCELLED => '#d63638',
+            self::PENDING => '#ea580c',    // Orange - warning state
+            self::CONFIRMED => '#0073aa',  // Blue - confirmed/success state
+            self::CANCELLED => '#646970',  // Gray - neutral/cancelled state
         ];
 
-        return $colors[$status] ?? '#666';
+        return $colors[$status] ?? '#646970';
     }
 }

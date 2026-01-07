@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CallScheduler\Admin\Bookings;
 
+use CallScheduler\Admin\Components\StatusBadgeRenderer;
+use CallScheduler\Admin\Components\FilterTabsRenderer;
 use CallScheduler\BookingStatus;
 
 if (!defined('ABSPATH')) {
@@ -87,29 +89,13 @@ final class BookingsRenderer
 
     private function renderStatusTabs(array $data): void
     {
-        $counts = $data['status_counts'];
-        $current = $data['current_status'];
-        $baseUrl = admin_url('admin.php?page=cs-bookings');
-
-        ?>
-        <ul class="subsubsub">
-            <li>
-                <a href="<?php echo esc_url($baseUrl); ?>" <?php echo $current === null ? 'class="current"' : ''; ?>>
-                    <?php echo esc_html__('Vše', 'call-scheduler'); ?>
-                    <span class="count">(<?php echo esc_html($counts['all']); ?>)</span>
-                </a> |
-            </li>
-            <?php foreach ([BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED] as $index => $status): ?>
-                <li>
-                    <a href="<?php echo esc_url(add_query_arg('status', $status, $baseUrl)); ?>"
-                       <?php echo $current === $status ? 'class="current"' : ''; ?>>
-                        <?php echo esc_html(BookingStatus::label($status)); ?>
-                        <span class="count">(<?php echo esc_html($counts[$status]); ?>)</span>
-                    </a><?php echo $status !== BookingStatus::CANCELLED ? ' |' : ''; ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-        <?php
+        FilterTabsRenderer::render(
+            admin_url('admin.php?page=cs-bookings'),
+            'status',
+            $data['current_status'],
+            $data['status_counts'],
+            'Vše'
+        );
     }
 
     private function renderFilters(array $data): void
@@ -249,9 +235,7 @@ final class BookingsRenderer
                 <span class="description"><?php echo esc_html(DateFormatter::time($booking->booking_time)); ?></span>
             </td>
             <td>
-                <span class="cs-status-badge" style="background-color: <?php echo esc_attr(BookingStatus::color($booking->status)); ?>;">
-                    <?php echo esc_html(BookingStatus::label($booking->status)); ?>
-                </span>
+                <?php echo StatusBadgeRenderer::render($booking->status); ?>
             </td>
             <td>
                 <span class="description"><?php echo esc_html(DateFormatter::dateTimeFromUtc($booking->created_at)); ?></span>

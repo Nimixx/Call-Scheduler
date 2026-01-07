@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace CallScheduler\Admin\Dashboard;
 
+use CallScheduler\Admin\Components\StatusBadgeRenderer;
+use CallScheduler\Admin\Components\FilterTabsRenderer;
+use CallScheduler\Admin\Components\TableRenderer;
 use CallScheduler\BookingStatus;
 
 if (!defined('ABSPATH')) {
@@ -185,28 +188,15 @@ final class DashboardRenderer
         <div class="cs-my-bookings">
             <h2><?php esc_html_e('Moje rezervace', 'call-scheduler'); ?></h2>
 
-            <ul class="subsubsub">
-                <li>
-                    <a href="<?php echo esc_url($baseUrl); ?>" <?php echo $statusFilter === null ? 'class="current"' : ''; ?>>
-                        <?php esc_html_e('Vše', 'call-scheduler'); ?>
-                    </a> |
-                </li>
-                <li>
-                    <a href="<?php echo esc_url(add_query_arg('dashboard_status', BookingStatus::PENDING, $baseUrl)); ?>" <?php echo $statusFilter === BookingStatus::PENDING ? 'class="current"' : ''; ?>>
-                        <?php esc_html_e('Čekající', 'call-scheduler'); ?>
-                    </a> |
-                </li>
-                <li>
-                    <a href="<?php echo esc_url(add_query_arg('dashboard_status', BookingStatus::CONFIRMED, $baseUrl)); ?>" <?php echo $statusFilter === BookingStatus::CONFIRMED ? 'class="current"' : ''; ?>>
-                        <?php esc_html_e('Potvrzené', 'call-scheduler'); ?>
-                    </a> |
-                </li>
-                <li>
-                    <a href="<?php echo esc_url(add_query_arg('dashboard_status', BookingStatus::CANCELLED, $baseUrl)); ?>" <?php echo $statusFilter === BookingStatus::CANCELLED ? 'class="current"' : ''; ?>>
-                        <?php esc_html_e('Zrušené', 'call-scheduler'); ?>
-                    </a>
-                </li>
-            </ul>
+            <?php
+            FilterTabsRenderer::render(
+                $baseUrl,
+                'dashboard_status',
+                $statusFilter,
+                null, // No counts for dashboard tabs
+                'Vše'
+            );
+            ?>
 
             <?php $this->renderBookingsTable($bookings); ?>
         </div>
@@ -221,9 +211,10 @@ final class DashboardRenderer
      */
     private function renderBookingsTable(array $bookings): void
     {
-        ?>
-        <table class="wp-list-table widefat fixed striped">
-            <thead>
+        TableRenderer::render(
+            $bookings,
+            function (): void {
+                ?>
                 <tr>
                     <th><?php esc_html_e('Zákazník', 'call-scheduler'); ?></th>
                     <th><?php esc_html_e('Email', 'call-scheduler'); ?></th>
@@ -231,67 +222,23 @@ final class DashboardRenderer
                     <th><?php esc_html_e('Čas', 'call-scheduler'); ?></th>
                     <th><?php esc_html_e('Stav', 'call-scheduler'); ?></th>
                 </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($bookings)): ?>
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px;">
-                            <?php esc_html_e('Žádné rezervace nenalezeny.', 'call-scheduler'); ?>
-                        </td>
-                    </tr>
-                <?php else: ?>
-                    <?php foreach ($bookings as $booking): ?>
-                        <tr>
-                            <td><?php echo esc_html($booking->customer_name); ?></td>
-                            <td><?php echo esc_html($booking->customer_email); ?></td>
-                            <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($booking->booking_date))); ?></td>
-                            <td><?php echo esc_html(substr($booking->booking_time, 0, 5)); ?></td>
-                            <td><?php echo $this->renderStatusBadge($booking->status); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
-        <?php
-    }
-
-    /**
-     * Render status badge
-     *
-     * @param string $status
-     * @return string
-     */
-    private function renderStatusBadge(string $status): string
-    {
-        $labels = [
-            BookingStatus::PENDING => __('Čekající', 'call-scheduler'),
-            BookingStatus::CONFIRMED => __('Potvrzená', 'call-scheduler'),
-            BookingStatus::CANCELLED => __('Zrušená', 'call-scheduler'),
-        ];
-
-        $label = $labels[$status] ?? $status;
-
-        return sprintf(
-            '<span class="cs-status-badge %s" style="background-color: %s;">%s</span>',
-            esc_attr($status),
-            esc_attr($this->getStatusColor($status)),
-            esc_html($label)
+                <?php
+            },
+            function ($booking): void {
+                ?>
+                <tr>
+                    <td><?php echo esc_html($booking->customer_name); ?></td>
+                    <td><?php echo esc_html($booking->customer_email); ?></td>
+                    <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($booking->booking_date))); ?></td>
+                    <td><?php echo esc_html(substr($booking->booking_time, 0, 5)); ?></td>
+                    <td><?php echo StatusBadgeRenderer::render($booking->status); ?></td>
+                </tr>
+                <?php
+            },
+            __('Žádné rezervace nenalezeny.', 'call-scheduler'),
+            5, // colspan
+            false // no footer
         );
     }
 
-    /**
-     * Get status color
-     *
-     * @param string $status
-     * @return string
-     */
-    private function getStatusColor(string $status): string
-    {
-        return match ($status) {
-            BookingStatus::PENDING => '#ea580c',
-            BookingStatus::CONFIRMED => '#0073aa',
-            BookingStatus::CANCELLED => '#646970',
-            default => '#646970',
-        };
-    }
 }

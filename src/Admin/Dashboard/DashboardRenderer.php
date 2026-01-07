@@ -38,7 +38,7 @@ final class DashboardRenderer
                             <?php esc_html_e('Čekající rezervace', 'call-scheduler'); ?>
                         </div>
                         <div class="cs-widget-action">
-                            <a href="<?php echo esc_url(admin_url('admin.php?page=cs-bookings&status=pending')); ?>" class="button button-small">
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=cs-bookings&status=pending')); ?>" class="cs-dashboard-btn">
                                 <?php esc_html_e('Zobrazit', 'call-scheduler'); ?>
                             </a>
                         </div>
@@ -53,7 +53,7 @@ final class DashboardRenderer
                             <?php esc_html_e('Potvrzené rezervace', 'call-scheduler'); ?>
                         </div>
                         <div class="cs-widget-action">
-                            <a href="<?php echo esc_url(admin_url('admin.php?page=cs-bookings&status=confirmed')); ?>" class="button button-small">
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=cs-bookings&status=confirmed')); ?>" class="cs-dashboard-btn">
                                 <?php esc_html_e('Zobrazit', 'call-scheduler'); ?>
                             </a>
                         </div>
@@ -68,7 +68,7 @@ final class DashboardRenderer
                             <?php esc_html_e('Celkem rezervací', 'call-scheduler'); ?>
                         </div>
                         <div class="cs-widget-action">
-                            <a href="<?php echo esc_url(admin_url('admin.php?page=cs-bookings')); ?>" class="button button-small">
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=cs-bookings')); ?>" class="cs-dashboard-btn">
                                 <?php esc_html_e('Zobrazit vše', 'call-scheduler'); ?>
                             </a>
                         </div>

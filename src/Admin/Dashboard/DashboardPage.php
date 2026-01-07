@@ -33,7 +33,7 @@ final class DashboardPage
     public function enqueueAssets(string $hook): void
     {
         $screen = get_current_screen();
-        if ($screen === null || $screen->id !== 'toplevel_page_cs-dashboard') {
+        if ($screen === null || !str_ends_with($screen->id, '_page_cs-dashboard')) {
             return;
         }
 
@@ -64,16 +64,18 @@ final class DashboardPage
     /**
      * Transform BookingsRepository counts format to dashboard format
      *
-     * @param array{all: int, pending: int, confirmed: int, cancelled: int} $counts
+     * Validates structure and provides safe defaults for missing keys.
+     *
+     * @param array $counts Expected keys: all, pending, confirmed, cancelled
      * @return array{total: int, pending: int, confirmed: int, cancelled: int}
      */
     private function transformStats(array $counts): array
     {
         return [
-            'total' => $counts['all'],
-            'pending' => $counts[BookingStatus::PENDING],
-            'confirmed' => $counts[BookingStatus::CONFIRMED],
-            'cancelled' => $counts[BookingStatus::CANCELLED],
+            'total' => (int) ($counts['all'] ?? 0),
+            'pending' => (int) ($counts[BookingStatus::PENDING] ?? 0),
+            'confirmed' => (int) ($counts[BookingStatus::CONFIRMED] ?? 0),
+            'cancelled' => (int) ($counts[BookingStatus::CANCELLED] ?? 0),
         ];
     }
 }

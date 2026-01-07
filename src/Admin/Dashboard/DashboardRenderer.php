@@ -26,7 +26,7 @@ final class DashboardRenderer
                 <!-- Pending Reservations Widget -->
                 <div class="cs-widget cs-widget-pending">
                     <div class="cs-widget-inner">
-                        <div class="cs-widget-number"><?php echo absint($stats['pending']); ?></div>
+                        <div class="cs-widget-number"><?php echo absint($stats['pending'] ?? 0); ?></div>
                         <div class="cs-widget-label">
                             <?php esc_html_e('Čekající rezervace', 'call-scheduler'); ?>
                         </div>
@@ -41,7 +41,7 @@ final class DashboardRenderer
                 <!-- Confirmed Reservations Widget -->
                 <div class="cs-widget cs-widget-confirmed">
                     <div class="cs-widget-inner">
-                        <div class="cs-widget-number"><?php echo absint($stats['confirmed']); ?></div>
+                        <div class="cs-widget-number"><?php echo absint($stats['confirmed'] ?? 0); ?></div>
                         <div class="cs-widget-label">
                             <?php esc_html_e('Potvrzené rezervace', 'call-scheduler'); ?>
                         </div>
@@ -56,7 +56,7 @@ final class DashboardRenderer
                 <!-- Total Reservations Widget -->
                 <div class="cs-widget cs-widget-total">
                     <div class="cs-widget-inner">
-                        <div class="cs-widget-number"><?php echo absint($stats['total']); ?></div>
+                        <div class="cs-widget-number"><?php echo absint($stats['total'] ?? 0); ?></div>
                         <div class="cs-widget-label">
                             <?php esc_html_e('Celkem rezervací', 'call-scheduler'); ?>
                         </div>

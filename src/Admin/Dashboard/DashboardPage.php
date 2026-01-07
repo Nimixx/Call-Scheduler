@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace CallScheduler\Admin\Dashboard;
 
+use CallScheduler\Admin\Bookings\BookingsRepository;
+use CallScheduler\BookingStatus;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -13,12 +16,12 @@ if (!defined('ABSPATH')) {
  */
 final class DashboardPage
 {
-    private DashboardRepository $repository;
+    private BookingsRepository $repository;
     private DashboardRenderer $renderer;
 
-    public function __construct()
+    public function __construct(?BookingsRepository $repository = null)
     {
-        $this->repository = new DashboardRepository();
+        $this->repository = $repository ?? new BookingsRepository();
         $this->renderer = new DashboardRenderer();
     }
 
@@ -53,7 +56,24 @@ final class DashboardPage
             return;
         }
 
-        $stats = $this->repository->getStats();
+        $counts = $this->repository->countByStatus();
+        $stats = $this->transformStats($counts);
         $this->renderer->renderPage($stats);
+    }
+
+    /**
+     * Transform BookingsRepository counts format to dashboard format
+     *
+     * @param array{all: int, pending: int, confirmed: int, cancelled: int} $counts
+     * @return array{total: int, pending: int, confirmed: int, cancelled: int}
+     */
+    private function transformStats(array $counts): array
+    {
+        return [
+            'total' => $counts['all'],
+            'pending' => $counts[BookingStatus::PENDING],
+            'confirmed' => $counts[BookingStatus::CONFIRMED],
+            'cancelled' => $counts[BookingStatus::CANCELLED],
+        ];
     }
 }

@@ -6,6 +6,7 @@ namespace CallScheduler\Admin\Bookings;
 
 use CallScheduler\BookingStatus;
 use CallScheduler\Cache;
+use CallScheduler\Helpers\DataValidator;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -100,12 +101,12 @@ final class BookingsRepository
         $cached = $this->cache->get(self::CACHE_KEY_COUNTS);
 
         // If cache exists and is valid, return it
-        if ($cached !== null && $this->isValidCounts($cached)) {
+        if ($cached !== null && DataValidator::isValidStatusCounts($cached)) {
             return $cached;
         }
 
         // Cache missing or corrupted - log if corrupted
-        if ($cached !== null && !$this->isValidCounts($cached)) {
+        if ($cached !== null && !DataValidator::isValidStatusCounts($cached)) {
             $this->logCacheCorruption($cached);
             // Delete corrupted cache so we don't use it again
             $this->cache->delete(self::CACHE_KEY_COUNTS);
@@ -115,10 +116,10 @@ final class BookingsRepository
         $counts = $this->generateCountsByStatus();
 
         // Validate before caching
-        if (!$this->isValidCounts($counts)) {
+        if (!DataValidator::isValidStatusCounts($counts)) {
             $this->logDataIntegrityError($counts);
             // Return safe defaults rather than corrupted data
-            return $this->getDefaultCounts();
+            return DataValidator::getDefaultStatusCounts();
         }
 
         // Cache the valid counts
@@ -155,71 +156,6 @@ final class BookingsRepository
         }
 
         return $counts;
-    }
-
-    /**
-     * Validate counts array structure and values
-     *
-     * Expected format:
-     * - 'all': integer >= 0
-     * - 'pending': integer >= 0
-     * - 'confirmed': integer >= 0
-     * - 'cancelled': integer >= 0
-     *
-     * @param mixed $counts Data to validate
-     * @return bool True if valid, false otherwise
-     */
-    private function isValidCounts(mixed $counts): bool
-    {
-        // Must be array
-        if (!is_array($counts)) {
-            return false;
-        }
-
-        $required_keys = ['all', BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED];
-
-        // Check all required keys exist and have valid values
-        foreach ($required_keys as $key) {
-            if (!isset($counts[$key])) {
-                return false;
-            }
-
-            // Must be integer or numeric
-            if (!is_int($counts[$key]) && !is_numeric($counts[$key])) {
-                return false;
-            }
-
-            // Must be >= 0 (counts can't be negative)
-            if ((int) $counts[$key] < 0) {
-                return false;
-            }
-        }
-
-        // Consistency check: all should equal sum of statuses
-        $sum = (int) $counts[BookingStatus::PENDING]
-            + (int) $counts[BookingStatus::CONFIRMED]
-            + (int) $counts[BookingStatus::CANCELLED];
-
-        if ((int) $counts['all'] !== $sum) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Get default/safe counts when data is corrupted
-     *
-     * @return array Safe defaults with all zeros
-     */
-    private function getDefaultCounts(): array
-    {
-        return [
-            'all' => 0,
-            BookingStatus::PENDING => 0,
-            BookingStatus::CONFIRMED => 0,
-            BookingStatus::CANCELLED => 0,
-        ];
     }
 
     /**

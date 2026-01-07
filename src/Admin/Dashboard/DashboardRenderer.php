@@ -7,6 +7,7 @@ namespace CallScheduler\Admin\Dashboard;
 use CallScheduler\Admin\Components\StatusBadgeRenderer;
 use CallScheduler\Admin\Components\FilterTabsRenderer;
 use CallScheduler\Admin\Components\TableRenderer;
+use CallScheduler\Admin\Components\NoticeRenderer;
 use CallScheduler\BookingStatus;
 
 if (!defined('ABSPATH')) {
@@ -92,9 +93,12 @@ final class DashboardRenderer
     {
         ?>
         <div class="wrap cs-dashboard-page">
-            <div class="notice notice-error">
-                <p><?php esc_html_e('Zásuvný modul není nainstalován. Prosím aktivujte jej.', 'call-scheduler'); ?></p>
-            </div>
+            <?php
+            NoticeRenderer::error(
+                esc_html__('Zásuvný modul není nainstalován. Prosím aktivujte jej.', 'call-scheduler'),
+                false
+            );
+            ?>
         </div>
         <?php
     }
@@ -148,14 +152,10 @@ final class DashboardRenderer
             return;
         }
 
-        ?>
-        <div class="notice notice-warning">
-            <p>
-                <strong><?php esc_html_e('⚠️ Dashboard Data Issue:', 'call-scheduler'); ?></strong>
-                <?php esc_html_e('Dashboard statistics data is incomplete or corrupted. Showing fallback values (0). Please check the debug log for details.', 'call-scheduler'); ?>
-            </p>
-        </div>
-        <?php
+        NoticeRenderer::warning(
+            '<strong>' . esc_html__('⚠️ Dashboard Data Issue:', 'call-scheduler') . '</strong> ' .
+            esc_html__('Dashboard statistics data is incomplete or corrupted. Showing fallback values (0). Please check the debug log for details.', 'call-scheduler')
+        );
     }
 
     /**

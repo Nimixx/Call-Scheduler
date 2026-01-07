@@ -6,6 +6,8 @@ namespace CallScheduler\Admin\Dashboard;
 
 use CallScheduler\Admin\Bookings\BookingsRepository;
 use CallScheduler\BookingStatus;
+use CallScheduler\Helpers\DataValidator;
+use CallScheduler\Helpers\FilterSanitizer;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -59,7 +61,7 @@ final class DashboardPage
         $counts = $this->repository->countByStatus();
 
         // Validate data structure before transformation
-        if (!$this->isValidStatsStructure($counts)) {
+        if (!DataValidator::isValidStatusCounts($counts)) {
             $this->logDataIntegrityWarning($counts);
         }
 
@@ -67,57 +69,11 @@ final class DashboardPage
 
         // Get current user's bookings
         $currentUserId = get_current_user_id();
-        $statusFilter = isset($_GET['dashboard_status']) ? sanitize_text_field($_GET['dashboard_status']) : null;
-
-        // Validate status filter
-        if ($statusFilter !== null && !BookingStatus::isValid($statusFilter)) {
-            $statusFilter = null;
-        }
+        $statusFilter = FilterSanitizer::sanitizeStatus('dashboard_status');
 
         $userBookings = $this->repository->getBookingsForUser($currentUserId, $statusFilter, 10);
 
         $this->renderer->renderPage($stats, $userBookings, $statusFilter);
-    }
-
-    /**
-     * Validate that stats array has expected structure and types
-     *
-     * Expected structure:
-     * - 'all': integer >= 0
-     * - 'pending': integer >= 0
-     * - 'confirmed': integer >= 0
-     * - 'cancelled': integer >= 0
-     *
-     * @param mixed $counts Data to validate
-     * @return bool True if structure is valid, false otherwise
-     */
-    private function isValidStatsStructure(mixed $counts): bool
-    {
-        // Must be array
-        if (!is_array($counts)) {
-            return false;
-        }
-
-        $required_keys = ['all', BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED];
-
-        // Check all required keys exist
-        foreach ($required_keys as $key) {
-            if (!isset($counts[$key])) {
-                return false;
-            }
-
-            // Values must be integers or numeric
-            if (!is_int($counts[$key]) && !is_numeric($counts[$key])) {
-                return false;
-            }
-
-            // Values must be >= 0
-            if ((int) $counts[$key] < 0) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**

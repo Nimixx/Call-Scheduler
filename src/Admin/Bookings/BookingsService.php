@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CallScheduler\Admin\Bookings;
 
 use CallScheduler\BookingStatus;
+use CallScheduler\Helpers\FilterSanitizer;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -79,10 +80,10 @@ final class BookingsService
 
     private function handleStatusChange(array &$redirectArgs): void
     {
-        $bookingId = isset($_POST['booking_id']) ? absint($_POST['booking_id']) : 0;
-        $newStatus = isset($_POST['new_status']) ? sanitize_text_field($_POST['new_status']) : '';
+        $bookingId = FilterSanitizer::sanitizePostInt('booking_id');
+        $newStatus = FilterSanitizer::sanitizePostStatus('new_status');
 
-        if ($bookingId === 0 || !BookingStatus::isValid($newStatus)) {
+        if ($bookingId === 0 || $newStatus === null) {
             $redirectArgs['error'] = '1';
             $this->redirect($redirectArgs);
             return;
@@ -124,7 +125,7 @@ final class BookingsService
 
     private function handleBulkAction(array &$redirectArgs): void
     {
-        $bulkAction = isset($_POST['bulk_action']) ? sanitize_text_field($_POST['bulk_action']) : '';
+        $bulkAction = FilterSanitizer::sanitizePostText('bulk_action');
         $bookingIds = isset($_POST['booking_ids']) ? array_map('absint', (array) $_POST['booking_ids']) : [];
 
         if (empty($bookingIds) || $bulkAction === '' || $bulkAction === '-1') {
@@ -152,40 +153,23 @@ final class BookingsService
 
     private function getFilterStatus(): ?string
     {
-        $status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : null;
-
-        if ($status !== null && !BookingStatus::isValid($status)) {
-            return null;
-        }
-
-        return $status;
+        return FilterSanitizer::sanitizeStatus('status');
     }
 
     private function getFilterDateFrom(): ?string
     {
-        $date = isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : null;
-
-        if ($date !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            return null;
-        }
-
-        return $date;
+        return FilterSanitizer::sanitizeDate('date_from');
     }
 
     private function getFilterDateTo(): ?string
     {
-        $date = isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : null;
-
-        if ($date !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            return null;
-        }
-
-        return $date;
+        return FilterSanitizer::sanitizeDate('date_to');
     }
 
     private function getCurrentPage(): int
     {
-        return isset($_GET['paged']) ? max(1, absint($_GET['paged'])) : 1;
+        $page = FilterSanitizer::sanitizeGetInt('paged');
+        return max(1, $page === 0 ? 1 : $page);
     }
 
     private function getFilterRedirectArgs(): array
@@ -214,7 +198,8 @@ final class BookingsService
         }
 
         $actionType = isset($_GET['action_type']) ? sanitize_text_field($_GET['action_type']) : '';
-        $count = isset($_GET['count']) ? absint($_GET['count']) : 1;
+        $count = FilterSanitizer::sanitizeGetInt('count');
+        $count = $count === 0 ? 1 : $count;
 
         switch ($actionType) {
             case 'status':

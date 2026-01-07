@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CallScheduler\Admin\Availability;
 
+use CallScheduler\Admin\Components\NoticeRenderer;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -54,11 +56,12 @@ final class AvailabilityRenderer
         ?>
         <div class="wrap">
             <h1><?php echo esc_html__('Nastavení dostupnosti', 'call-scheduler'); ?></h1>
-            <div class="notice notice-error">
-                <p>
-                    <?php echo esc_html__('Databázové tabulky pluginu nejsou nainstalovány. Prosím deaktivujte a znovu aktivujte plugin.', 'call-scheduler'); ?>
-                </p>
-            </div>
+            <?php
+            NoticeRenderer::error(
+                esc_html__('Databázové tabulky pluginu nejsou nainstalovány. Prosím deaktivujte a znovu aktivujte plugin.', 'call-scheduler'),
+                false
+            );
+            ?>
         </div>
         <?php
     }
@@ -83,14 +86,10 @@ final class AvailabilityRenderer
         if (!$data['show_success']) {
             return;
         }
-        ?>
-        <div class="notice notice-success is-dismissible">
-            <p>
-                <span class="dashicons dashicons-yes-alt"></span>
-                <?php echo esc_html__('Dostupnost byla úspěšně uložena!', 'call-scheduler'); ?>
-            </p>
-        </div>
-        <?php
+
+        NoticeRenderer::success(
+            esc_html__('Dostupnost byla úspěšně uložena!', 'call-scheduler')
+        );
     }
 
     private function renderErrorNotice(array $data): void
@@ -98,14 +97,10 @@ final class AvailabilityRenderer
         if (!$data['show_error']) {
             return;
         }
-        ?>
-        <div class="notice notice-error is-dismissible">
-            <p>
-                <span class="dashicons dashicons-warning"></span>
-                <?php echo esc_html__('Chyba při ukládání dostupnosti. Některé změny se nemusely uložit. Zkuste to prosím znovu.', 'call-scheduler'); ?>
-            </p>
-        </div>
-        <?php
+
+        NoticeRenderer::error(
+            esc_html__('Chyba při ukládání dostupnosti. Některé změny se nemusely uložit. Zkuste to prosím znovu.', 'call-scheduler')
+        );
     }
 
     private function renderNoTeamMembersNotice(): void

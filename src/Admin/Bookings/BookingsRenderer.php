@@ -6,6 +6,7 @@ namespace CallScheduler\Admin\Bookings;
 
 use CallScheduler\Admin\Components\StatusBadgeRenderer;
 use CallScheduler\Admin\Components\FilterTabsRenderer;
+use CallScheduler\Admin\Components\NoticeRenderer;
 use CallScheduler\BookingStatus;
 
 if (!defined('ABSPATH')) {
@@ -49,11 +50,12 @@ final class BookingsRenderer
         ?>
         <div class="wrap">
             <h1><?php echo esc_html__('Všechny rezervace', 'call-scheduler'); ?></h1>
-            <div class="notice notice-error">
-                <p>
-                    <?php echo esc_html__('Databázové tabulky pluginu nejsou nainstalovány. Prosím deaktivujte a znovu aktivujte plugin.', 'call-scheduler'); ?>
-                </p>
-            </div>
+            <?php
+            NoticeRenderer::error(
+                esc_html__('Databázové tabulky pluginu nejsou nainstalovány. Prosím deaktivujte a znovu aktivujte plugin.', 'call-scheduler'),
+                false
+            );
+            ?>
         </div>
         <?php
     }
@@ -68,23 +70,15 @@ final class BookingsRenderer
 
     private function renderNotices(array $data): void
     {
-        if ($data['show_success'] && $data['success_message']): ?>
-            <div class="notice notice-success is-dismissible">
-                <p>
-                    <span class="dashicons dashicons-yes-alt"></span>
-                    <?php echo esc_html($data['success_message']); ?>
-                </p>
-            </div>
-        <?php endif;
+        if ($data['show_success'] && $data['success_message']) {
+            NoticeRenderer::success(esc_html($data['success_message']));
+        }
 
-        if ($data['show_error']): ?>
-            <div class="notice notice-error is-dismissible">
-                <p>
-                    <span class="dashicons dashicons-warning"></span>
-                    <?php echo esc_html__('Při zpracování požadavku došlo k chybě. Zkuste to prosím znovu.', 'call-scheduler'); ?>
-                </p>
-            </div>
-        <?php endif;
+        if ($data['show_error']) {
+            NoticeRenderer::error(
+                esc_html__('Při zpracování požadavku došlo k chybě. Zkuste to prosím znovu.', 'call-scheduler')
+            );
+        }
     }
 
     private function renderStatusTabs(array $data): void

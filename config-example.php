@@ -53,29 +53,50 @@ define('CS_BUFFER_TIME', 15);
 define('CS_MAX_BOOKING_DAYS', 30);
 
 // ============================================================================
+// WEBHOOK CONFIGURATION (Optional)
+// ============================================================================
+
+/**
+ * Webhook Secret Key (for HMAC-SHA256 signature)
+ *
+ * Used to sign webhook payloads so the receiving endpoint can verify
+ * the request came from your WordPress site.
+ *
+ * SECURITY: This is stored here (not in database) to prevent exposure
+ * via SQL injection, database backups, or other plugin access.
+ *
+ * Generate a secure random key:
+ *   - Linux/Mac: openssl rand -hex 32
+ *   - Or use: https://randomkeygen.com (256-bit WEP Keys)
+ *
+ * The webhook URL is configured in: Settings > Call Scheduler > Webhooks
+ */
+// define('CS_WEBHOOK_SECRET', 'your-secret-key-here');
+
+// ============================================================================
 // END CALL SCHEDULER CONFIGURATION
 // ============================================================================
 
 /*
  * RESULT WITH ABOVE CONFIGURATION:
  *
- * Slot Duration: 30 minutes
- * Buffer Time:   15 minutes
- * Total Block:   45 minutes per booking
+ * Slot Duration:   30 minutes (meeting length)
+ * Buffer Time:     15 minutes (break after each meeting)
+ * Slot Interval:   45 minutes (time between consecutive bookings)
  *
  * Example Schedule (9:00-17:00):
- * ─────────────────────────────────
+ * ─────────────────────────────────────────────────────────────
  * 09:00-09:30  Meeting 1
- * 09:30-09:45  Buffer (blocked)
+ * 09:30-09:45  Buffer (prep time, notes, break)
  * 09:45-10:15  Meeting 2
- * 10:15-10:30  Buffer (blocked)
+ * 10:15-10:30  Buffer
  * 10:30-11:00  Meeting 3
- * 11:00-11:15  Buffer (blocked)
+ * 11:00-11:15  Buffer
  * 11:15-11:45  Meeting 4
  * ... and so on
  *
- * Capacity: ~10 bookings per day (vs 8 with 60-minute slots)
- *
- * Available booking times:
+ * Available booking times (45-minute intervals):
  * 09:00, 09:45, 10:30, 11:15, 12:00, 12:45, 13:30, 14:15, 15:00, 15:45, 16:30
+ *
+ * Capacity: ~10-11 bookings per 8-hour day
  */

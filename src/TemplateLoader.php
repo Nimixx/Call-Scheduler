@@ -8,68 +8,59 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Template loader for email templates
+ *
+ * Loads PHP templates from the plugin's templates/emails/ directory.
+ * Templates receive data as extracted variables.
+ */
 final class TemplateLoader
 {
-    private const TEMPLATE_NAMESPACE = 'bookings';
+    private const TEMPLATES_DIR = 'templates/emails';
 
     /**
-     * Load and render email template from email-manager plugin using Blade
+     * Load and render email template from plugin templates directory
      *
-     * @param string $template Template name (e.g., 'customer-confirmation')
-     * @param array $data Data to pass to template
+     * @param string $template Template name without extension (e.g., 'customer-confirmation')
+     * @param array $data Data to pass to template as variables
      * @return string Rendered template HTML
      */
     public static function load(string $template, array $data): string
     {
-        // Check if email-manager plugin is active
-        if (!self::isEmailManagerActive()) {
+        $template_path = self::getTemplatePath($template);
+
+        if (!file_exists($template_path)) {
             return '';
         }
 
-        // Load BladeRenderer from email-manager plugin
-        $path = WP_PLUGIN_DIR . '/email-manager/src/BladeRenderer.php';
-        if (!file_exists($path)) {
-            return '';
-        }
+        // Extract data array to variables for template use
+        extract($data, EXTR_SKIP);
 
-        // Ensure Composer autoload is loaded for BladeOne
-        $autoload = WP_PLUGIN_DIR . '/email-manager/vendor/autoload.php';
-        if (file_exists($autoload)) {
-            require_once $autoload;
-        }
-
-        require_once $path;
-
-        // Load template using Blade dot notation
-        // Example: 'customer-confirmation' becomes 'emails.bookings.customer-confirmation'
-        $template_path = 'emails.' . self::TEMPLATE_NAMESPACE . '.' . $template;
-        return \EmailManager\BladeRenderer::render($template_path, $data);
+        // Capture template output
+        ob_start();
+        include $template_path;
+        return ob_get_clean() ?: '';
     }
 
     /**
-     * Check if email-manager plugin is active
+     * Check if template exists in plugin templates directory
      *
-     * @return bool True if plugin is active
-     */
-    private static function isEmailManagerActive(): bool
-    {
-        if (!function_exists('is_plugin_active')) {
-            include_once ABSPATH . 'wp-admin/includes/plugin.php';
-        }
-
-        return is_plugin_active('email-manager/email-manager.php');
-    }
-
-    /**
-     * Check if template exists in email-manager plugin
-     *
-     * @param string $template Template name
+     * @param string $template Template name without extension
      * @return bool True if template exists
      */
     public static function exists(string $template): bool
     {
-        $template_path = self::TEMPLATE_NAMESPACE . '/' . $template;
-        $path = WP_PLUGIN_DIR . '/email-manager/templates/emails/' . $template_path . '.blade.php';
-        return file_exists($path);
+        return file_exists(self::getTemplatePath($template));
+    }
+
+    /**
+     * Get full path to template file
+     *
+     * @param string $template Template name without extension
+     * @return string Full path to template file
+     */
+    private static function getTemplatePath(string $template): string
+    {
+        return CS_PLUGIN_DIR . self::TEMPLATES_DIR . '/' . $template . '.php';
     }
 }

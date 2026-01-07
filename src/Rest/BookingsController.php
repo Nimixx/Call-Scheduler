@@ -7,6 +7,7 @@ namespace CallScheduler\Rest;
 use CallScheduler\BookingStatus;
 use CallScheduler\Config;
 use CallScheduler\Email;
+use CallScheduler\Plugin;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
@@ -152,14 +153,19 @@ final class BookingsController extends RestController
 
         // Send confirmation emails (non-blocking)
         $booking_data = [
+            'id' => $booking_id,
             'customer_name' => $customer_name,
             'customer_email' => $customer_email,
             'booking_date' => $booking_date,
             'booking_time' => $booking_time,
             'user_id' => $user_id,
+            'status' => BookingStatus::PENDING,
         ];
         $this->email->sendCustomerConfirmation($booking_data);
         $this->email->sendTeamMemberNotification($booking_data);
+
+        // Send webhook notification (non-blocking)
+        Plugin::getContainer()->webhook()->sendBookingCreated($booking_data);
 
         return $this->successResponse([
             'id' => $booking_id,
@@ -209,11 +215,8 @@ final class BookingsController extends RestController
             return $this->errorResponse('invalid_time', 'Invalid time. Hours must be 00-23, minutes 00-59.');
         }
 
-        if (!Config::isValidSlotTime($time)) {
-            $slot_duration = Config::getSlotDuration();
-            $examples = $this->getSlotExamples();
-            return $this->errorResponse('invalid_time', "Bookings must be on {$slot_duration}-minute intervals (e.g., {$examples}).");
-        }
+        // Note: Slot boundary validation removed - frontend uses availability API
+        // which returns only valid slots. Working hours checked in validateAvailability().
 
         return null;
     }
@@ -262,21 +265,4 @@ final class BookingsController extends RestController
         return null;
     }
 
-    private function getSlotExamples(): string
-    {
-        $slot_duration = Config::getSlotDuration();
-        $examples = [];
-
-        for ($i = 0; $i < 3; $i++) {
-            $minutes = $i * $slot_duration;
-            $hours = 9;
-            if ($minutes >= 60) {
-                $hours += floor($minutes / 60);
-                $minutes = $minutes % 60;
-            }
-            $examples[] = sprintf('%02d:%02d', $hours, $minutes);
-        }
-
-        return implode(', ', $examples);
-    }
 }

@@ -257,10 +257,36 @@ final class Config
     }
 
     /**
+     * Get the slot interval (duration + buffer) in minutes
+     *
+     * This is the time between consecutive slot start times.
+     *
+     * @return int Interval in minutes
+     */
+    public static function getSlotInterval(): int
+    {
+        return self::getSlotDuration() + self::getBufferTime();
+    }
+
+    /**
+     * Get the slot interval in seconds
+     *
+     * @return int Interval in seconds
+     */
+    public static function getSlotIntervalSeconds(): int
+    {
+        return self::getSlotInterval() * 60;
+    }
+
+    /**
      * Check if time is on valid slot boundary
      *
+     * @deprecated No longer used for validation. Slots are generated dynamically
+     *             by AvailabilityController using slot_duration + buffer_time interval.
+     *             Kept for backward compatibility.
+     *
      * @param string $time Time in HH:MM format
-     * @return bool True if time is on slot boundary
+     * @return bool True if time is on slot boundary (based on slot_duration only)
      */
     public static function isValidSlotTime(string $time): bool
     {
@@ -272,6 +298,7 @@ final class Config
         $minutes = (int) $parts[1];
         $slot_duration = self::getSlotDuration();
 
+        // Legacy: only checks slot_duration, not buffer
         // For 60-minute slots: only 00 is valid
         // For 30-minute slots: 00, 30 are valid
         // For 15-minute slots: 00, 15, 30, 45 are valid
@@ -315,8 +342,8 @@ final class Config
             'slot_duration_minutes' => self::getSlotDuration(),
             'slot_duration_text' => self::getSlotDurationText(),
             'buffer_time_minutes' => self::getBufferTime(),
+            'slot_interval_minutes' => self::getSlotInterval(),
             'max_booking_days' => self::getMaxBookingDays(),
-            'valid_times_per_hour' => 60 / self::getSlotDuration(),
             // Security
             'rate_limit_read' => self::getRateLimitRead(),
             'rate_limit_write' => self::getRateLimitWrite(),
@@ -339,6 +366,7 @@ final class Config
         $map = [
             'slot_duration' => fn() => self::getSlotDuration(),
             'buffer_time' => fn() => self::getBufferTime(),
+            'slot_interval' => fn() => self::getSlotInterval(),
             'max_booking_days' => fn() => self::getMaxBookingDays(),
             'rate_limit.read' => fn() => self::getRateLimitRead(),
             'rate_limit.write' => fn() => self::getRateLimitWrite(),

@@ -26,19 +26,28 @@ final class Webhook
     /**
      * Send webhook for booking.created event
      *
-     * @param array $booking Booking data
+     * @param array $booking Booking data with keys: id, user_id, customer_name, customer_email, booking_date, booking_time, status
      * @return bool True if webhook was dispatched (not necessarily delivered)
      */
     public function sendBookingCreated(array $booking): bool
     {
+        // Validate required fields
+        $required = ['user_id', 'customer_name', 'customer_email', 'booking_date', 'booking_time'];
+        foreach ($required as $field) {
+            if (!isset($booking[$field])) {
+                $this->logError("Missing required field: {$field}");
+                return false;
+            }
+        }
+
         $payload = $this->buildPayload('booking.created', [
             'booking' => [
                 'id' => $booking['id'] ?? null,
-                'user_id' => $booking['user_id'],
-                'customer_name' => $booking['customer_name'],
-                'customer_email' => $booking['customer_email'],
-                'booking_date' => $booking['booking_date'],
-                'booking_time' => $booking['booking_time'],
+                'user_id' => (int) $booking['user_id'],
+                'customer_name' => (string) $booking['customer_name'],
+                'customer_email' => (string) $booking['customer_email'],
+                'booking_date' => (string) $booking['booking_date'],
+                'booking_time' => (string) $booking['booking_time'],
                 'status' => $booking['status'] ?? BookingStatus::PENDING,
             ],
             'team_member' => $this->getTeamMemberData((int) $booking['user_id']),
@@ -115,6 +124,12 @@ final class Webhook
             return false;
         }
 
+        // Security: SSRF protection at dispatch time (defense in depth)
+        if ($this->isInternalUrl($url)) {
+            $this->logError('Webhook URL points to internal address');
+            return false;
+        }
+
         $json_payload = wp_json_encode($payload);
         if ($json_payload === false) {
             return false;
@@ -187,6 +202,42 @@ final class Webhook
     {
         $options = get_option('cs_options', []);
         return !empty($options['webhook_enabled']) && !empty($options['webhook_url']);
+    }
+
+    /**
+     * Check if URL points to internal/private network (SSRF protection)
+     */
+    private function isInternalUrl(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!$host) {
+            return true;
+        }
+
+        $host = strtolower($host);
+
+        // Block localhost
+        if (in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+            return true;
+        }
+
+        // Block private IP patterns
+        $blocked_patterns = [
+            '/^10\./',
+            '/^172\.(1[6-9]|2[0-9]|3[01])\./',
+            '/^192\.168\./',
+            '/\.local$/',
+            '/\.internal$/',
+            '/\.localhost$/',
+        ];
+
+        foreach ($blocked_patterns as $pattern) {
+            if (preg_match($pattern, $host)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

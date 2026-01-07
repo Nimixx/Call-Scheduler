@@ -1,0 +1,91 @@
+/**
+ * Call Scheduler - Admin Dashboard Styles
+ */
+
+.cs-dashboard-page {
+    padding: 20px 0;
+}
+
+.cs-dashboard-page h1 {
+    margin-bottom: 30px;
+}
+
+.cs-dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.cs-widget {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease;
+}
+
+.cs-widget:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cs-widget-inner {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.cs-widget-number {
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 12px;
+    color: #1d2327;
+}
+
+.cs-widget-pending .cs-widget-number {
+    color: #cc5200;
+}
+
+.cs-widget-confirmed .cs-widget-number {
+    color: #135e96;
+}
+
+.cs-widget-total .cs-widget-number {
+    color: #2d3748;
+}
+
+.cs-widget-label {
+    font-size: 14px;
+    color: #646970;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.cs-widget-action {
+    width: 100%;
+}
+
+.cs-widget-action .button {
+    width: 100%;
+    text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .cs-dashboard-widgets {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cs-dashboard-widgets {
+        grid-template-columns: 1fr;
+    }
+
+    .cs-widget-number {
+        font-size: 36px;
+    }
+}

@@ -1,0 +1,59 @@
+<?php
+
+declare(strict_types=1);
+
+namespace CallScheduler\Admin\Dashboard;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * Controller for the Dashboard admin page
+ */
+final class DashboardPage
+{
+    private DashboardRepository $repository;
+    private DashboardRenderer $renderer;
+
+    public function __construct()
+    {
+        $this->repository = new DashboardRepository();
+        $this->renderer = new DashboardRenderer();
+    }
+
+    public function register(): void
+    {
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
+    }
+
+    public function enqueueAssets(string $hook): void
+    {
+        $screen = get_current_screen();
+        if ($screen === null || $screen->id !== 'toplevel_page_cs-dashboard') {
+            return;
+        }
+
+        wp_enqueue_style(
+            'cs-admin-dashboard',
+            CS_PLUGIN_URL . 'assets/css/admin-dashboard.css',
+            [],
+            CS_VERSION
+        );
+    }
+
+    public function render(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Nemáte dostatečná oprávnění pro přístup na tuto stránku.', 'call-scheduler'));
+        }
+
+        if (!$this->repository->isPluginInstalled()) {
+            $this->renderer->renderInstallationError();
+            return;
+        }
+
+        $stats = $this->repository->getStats();
+        $this->renderer->renderPage($stats);
+    }
+}

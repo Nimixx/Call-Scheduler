@@ -6,6 +6,7 @@ namespace CallScheduler\Admin;
 
 use CallScheduler\Admin\Availability\AvailabilityPage;
 use CallScheduler\Admin\Bookings\BookingsPage;
+use CallScheduler\Admin\Dashboard\DashboardPage;
 use CallScheduler\Admin\Settings\SettingsPage;
 use CallScheduler\Admin\Settings\Modules\WhitelabelModule;
 
@@ -22,11 +23,13 @@ final class AdminPages
 
     public function registerMenuPages(): void
     {
+        $dashboardPage = new DashboardPage();
         $bookingsPage = new BookingsPage();
         $availabilityPage = new AvailabilityPage();
         $settingsPage = new SettingsPage();
 
         // Register hooks for asset enqueuing
+        $dashboardPage->register();
         $bookingsPage->register();
         $availabilityPage->register();
         $settingsPage->register();
@@ -34,20 +37,30 @@ final class AdminPages
         // Get plugin name (whitelabel or default)
         $plugin_name = WhitelabelModule::getPluginName();
 
-        // Main menu page - Bookings list
+        // Main menu page - Dashboard
         add_menu_page(
-            __('Všechny rezervace', 'call-scheduler'),   // Page title
+            __('Přehled', 'call-scheduler'),              // Page title
             $plugin_name,                                      // Menu title (whitelabel)
             'manage_options',                                  // Capability
-            'cs-bookings',                                     // Menu slug
-            [$bookingsPage, 'render'],                         // Callback
+            'cs-dashboard',                                    // Menu slug
+            [$dashboardPage, 'render'],                        // Callback
             'dashicons-calendar-alt',                          // Icon
             30                                                 // Position
         );
 
+        // Submenu page - All Bookings
+        add_submenu_page(
+            'cs-dashboard',                                    // Parent slug
+            __('Všechny rezervace', 'call-scheduler'),   // Page title
+            __('Všechny rezervace', 'call-scheduler'),   // Menu title
+            'manage_options',                                  // Capability
+            'cs-bookings',                                     // Menu slug
+            [$bookingsPage, 'render']                          // Callback
+        );
+
         // Submenu page - Availability setup
         add_submenu_page(
-            'cs-bookings',                                     // Parent slug
+            'cs-dashboard',                                    // Parent slug
             __('Dostupnost', 'call-scheduler'),          // Page title
             __('Dostupnost', 'call-scheduler'),          // Menu title
             'manage_options',                                  // Capability
@@ -57,18 +70,12 @@ final class AdminPages
 
         // Submenu page - Settings
         add_submenu_page(
-            'cs-bookings',                                     // Parent slug
+            'cs-dashboard',                                    // Parent slug
             __('Nastavení', 'call-scheduler'),           // Page title
             __('Nastavení', 'call-scheduler'),           // Menu title
             'manage_options',                                  // Capability
             'cs-settings',                                     // Menu slug
             [$settingsPage, 'render']                          // Callback
         );
-
-        // Rename first submenu item to "All Bookings"
-        global $submenu;
-        if (isset($submenu['cs-bookings'][0])) {
-            $submenu['cs-bookings'][0][0] = __('Všechny rezervace', 'call-scheduler');
-        }
     }
 }

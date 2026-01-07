@@ -53,6 +53,25 @@ final class BookingsRepository
         return $wpdb->get_results($wpdb->prepare($sql, self::PER_PAGE, $offset));
     }
 
+    public function getBookingsForUser(
+        int $userId,
+        ?string $status = null,
+        int $limit = 10
+    ): array {
+        global $wpdb;
+
+        $where = $this->buildWhereClauseForUser($userId, $status);
+
+        $sql = "SELECT b.*, u.display_name as team_member_name
+                FROM {$wpdb->prefix}cs_bookings b
+                LEFT JOIN {$wpdb->users} u ON b.user_id = u.ID
+                {$where}
+                ORDER BY b.booking_date DESC, b.booking_time DESC
+                LIMIT %d";
+
+        return $wpdb->get_results($wpdb->prepare($sql, $limit));
+    }
+
     public function countBookings(
         ?string $status = null,
         ?string $dateFrom = null,
@@ -373,6 +392,25 @@ final class BookingsRepository
 
         if (empty($conditions)) {
             return '';
+        }
+
+        return 'WHERE ' . implode(' AND ', $conditions);
+    }
+
+    private function buildWhereClauseForUser(
+        int $userId,
+        ?string $status
+    ): string {
+        global $wpdb;
+
+        $conditions = [];
+
+        // Always filter by user_id
+        $conditions[] = $wpdb->prepare('b.user_id = %d', $userId);
+
+        // Optionally filter by status
+        if ($status !== null && BookingStatus::isValid($status)) {
+            $conditions[] = $wpdb->prepare('b.status = %s', $status);
         }
 
         return 'WHERE ' . implode(' AND ', $conditions);

@@ -64,7 +64,19 @@ final class DashboardPage
         }
 
         $stats = $this->transformStats($counts);
-        $this->renderer->renderPage($stats);
+
+        // Get current user's bookings
+        $currentUserId = get_current_user_id();
+        $statusFilter = isset($_GET['dashboard_status']) ? sanitize_text_field($_GET['dashboard_status']) : null;
+
+        // Validate status filter
+        if ($statusFilter !== null && !BookingStatus::isValid($statusFilter)) {
+            $statusFilter = null;
+        }
+
+        $userBookings = $this->repository->getBookingsForUser($currentUserId, $statusFilter, 10);
+
+        $this->renderer->renderPage($stats, $userBookings, $statusFilter);
     }
 
     /**

@@ -6,3 +6,18 @@
 .cs-dashboard-page h1 {
     margin-bottom: var(--cs-space-2xl);
 }
+
+/* My Bookings Section */
+.cs-my-bookings {
+    margin-top: var(--cs-space-3xl);
+}
+
+.cs-my-bookings h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: var(--cs-space-lg);
+}
+
+.cs-my-bookings .subsubsub {
+    margin-bottom: var(--cs-space-md);
+}

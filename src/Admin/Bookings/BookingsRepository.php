@@ -255,5 +255,8 @@ final class BookingsRepository
     public function invalidateCache(): void
     {
         $this->cache->delete(self::CACHE_KEY_COUNTS);
+
+        // Notify other repositories that need cache invalidation
+        do_action('cs_bookings_cache_invalidated');
     }
 }

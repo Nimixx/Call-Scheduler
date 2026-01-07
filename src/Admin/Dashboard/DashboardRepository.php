@@ -24,6 +24,9 @@ final class DashboardRepository
     public function __construct(?Cache $cache = null)
     {
         $this->cache = $cache ?? new Cache();
+
+        // Invalidate dashboard cache when bookings change
+        add_action('cs_bookings_cache_invalidated', [$this, 'invalidateCache']);
     }
 
     /**
@@ -46,25 +49,24 @@ final class DashboardRepository
 
                 $stats = [
                     'total' => 0,
-                    'pending' => 0,
-                    'confirmed' => 0,
-                    'cancelled' => 0,
+                    BookingStatus::PENDING => 0,
+                    BookingStatus::CONFIRMED => 0,
+                    BookingStatus::CANCELLED => 0,
                 ];
 
                 foreach ($results as $row) {
                     $count = (int) $row->count;
+                    $stats[(string) $row->status] = $count;
                     $stats['total'] += $count;
-
-                    if ($row->status === BookingStatus::PENDING) {
-                        $stats['pending'] = $count;
-                    } elseif ($row->status === BookingStatus::CONFIRMED) {
-                        $stats['confirmed'] = $count;
-                    } elseif ($row->status === BookingStatus::CANCELLED) {
-                        $stats['cancelled'] = $count;
-                    }
                 }
 
-                return $stats;
+                // Ensure all statuses exist in return array with correct keys
+                return [
+                    'total' => $stats['total'],
+                    'pending' => $stats[BookingStatus::PENDING] ?? 0,
+                    'confirmed' => $stats[BookingStatus::CONFIRMED] ?? 0,
+                    'cancelled' => $stats[BookingStatus::CANCELLED] ?? 0,
+                ];
             },
             self::CACHE_TTL
         );

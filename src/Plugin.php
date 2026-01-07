@@ -65,8 +65,11 @@ final class Plugin
         // Cache service (singleton)
         $this->container->set('cache', fn() => new Cache());
 
-        // Email service (singleton, uses cache)
+        // Email service (singleton)
         $this->container->set('email', fn(Container $c) => new Email());
+
+        // Webhook service (singleton)
+        $this->container->set('webhook', fn(Container $c) => new Webhook());
     }
 
     private function registerHooks(): void

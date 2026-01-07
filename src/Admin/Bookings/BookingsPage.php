@@ -32,7 +32,7 @@ final class BookingsPage
     public function enqueueAssets(string $hook): void
     {
         $screen = get_current_screen();
-        if ($screen === null || $screen->id !== 'toplevel_page_cs-bookings') {
+        if ($screen === null || !str_ends_with($screen->id, '_page_cs-bookings')) {
             return;
         }
 

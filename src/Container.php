@@ -76,4 +76,9 @@ final class Container
     {
         return $this->get('email');
     }
+
+    public function webhook(): Webhook
+    {
+        return $this->get('webhook');
+    }
 }

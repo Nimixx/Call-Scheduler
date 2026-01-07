@@ -2,7 +2,3 @@
  * Call Scheduler - Settings Page Styles
  * Settings management specific styles
  */
-
-.cs-settings-page {
-    max-width: var(--cs-max-width-form);
-}

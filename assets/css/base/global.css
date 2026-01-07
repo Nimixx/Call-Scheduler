@@ -3,13 +3,8 @@
  * Base styles for all admin pages
  */
 
-.wrap.cs-dashboard-page,
-.wrap.cs-availability-page,
-.wrap.cs-settings-page {
-    max-width: var(--cs-max-width);
-}
-
-.wrap.cs-settings-page {
+/* Let WordPress handle the native .wrap width */
+.cs-settings-page .cs-settings-card {
     max-width: var(--cs-max-width-form);
 }
 

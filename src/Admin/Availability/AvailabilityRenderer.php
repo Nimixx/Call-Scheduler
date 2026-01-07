@@ -214,13 +214,13 @@ final class AvailabilityRenderer
     {
         ?>
         <div class="cs-quick-actions">
-            <button type="button" class="button" onclick="wbToggleWeekdays(true)">
+            <button type="button" class="button" onclick="csToggleWeekdays(true)">
                 <?php echo esc_html__('Povolit pracovní dny', 'call-scheduler'); ?>
             </button>
-            <button type="button" class="button" onclick="wbToggleAll(false)">
+            <button type="button" class="button" onclick="csToggleAll(false)">
                 <?php echo esc_html__('Vypnout vše', 'call-scheduler'); ?>
             </button>
-            <button type="button" class="button" onclick="wbSetAllTimes('09:00', '17:00')">
+            <button type="button" class="button" onclick="csSetAllTimes('09:00', '17:00')">
                 <?php echo esc_html__('Nastavit vše na 9-17', 'call-scheduler'); ?>
             </button>
         </div>

@@ -175,6 +175,8 @@ final class Plugin
             header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
             header('Access-Control-Allow-Headers: Content-Type, X-WP-Nonce, X-CS-Token');
             header('Access-Control-Allow-Credentials: true');
+            header('Access-Control-Max-Age: 3600');
+            header('Access-Control-Expose-Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset');
         } elseif (!empty($origin)) {
             Security\AuditLogger::corsRejected($origin);
         }

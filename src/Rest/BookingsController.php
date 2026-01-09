@@ -33,6 +33,7 @@ final class BookingsController extends RestController
                 'customer_name' => [
                     'required' => true,
                     'type' => 'string',
+                    'maxLength' => 100,
                     'sanitize_callback' => 'sanitize_text_field',
                 ],
                 'customer_email' => [

@@ -195,6 +195,9 @@ final class BookingsRenderer
         ?>
         <tr>
             <td class="manage-column column-cb check-column">
+                <label for="cb-select-all" class="screen-reader-text">
+                    <?php esc_html_e('Vybrat všechny rezervace', 'call-scheduler'); ?>
+                </label>
                 <input type="checkbox" id="cb-select-all" />
             </td>
             <th scope="col" class="manage-column"><?php echo esc_html__('Zákazník', 'call-scheduler'); ?></th>
@@ -212,7 +215,13 @@ final class BookingsRenderer
         ?>
         <tr>
             <th scope="row" class="check-column">
-                <input type="checkbox" name="booking_ids[]" value="<?php echo esc_attr($booking->id); ?>" />
+                <label for="booking_<?php echo esc_attr($booking->id); ?>" class="screen-reader-text">
+                    <?php esc_html_e('Vybrat tuto rezervaci', 'call-scheduler'); ?>
+                </label>
+                <input type="checkbox"
+                       id="booking_<?php echo esc_attr($booking->id); ?>"
+                       name="booking_ids[]"
+                       value="<?php echo esc_attr($booking->id); ?>" />
             </th>
             <td>
                 <strong><?php echo esc_html($booking->customer_name); ?></strong>

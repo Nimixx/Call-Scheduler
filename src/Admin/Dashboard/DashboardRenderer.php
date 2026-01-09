@@ -23,11 +23,12 @@ final class DashboardRenderer
     {
         ?>
         <div class="wrap cs-dashboard-page">
-            <h1><?php esc_html_e('Přehled', 'call-scheduler'); ?></h1>
-
             <?php $this->renderNotices($data); ?>
 
-            <div class="cs-dashboard-widgets">
+            <div class="cs-stats-section">
+                <h2><?php esc_html_e('Přehled', 'call-scheduler'); ?></h2>
+
+                <div class="cs-dashboard-widgets">
                 <!-- Pending Reservations Widget -->
                 <div class="cs-widget cs-widget-pending">
                     <div class="cs-widget-inner">
@@ -71,6 +72,7 @@ final class DashboardRenderer
                             </a>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
 

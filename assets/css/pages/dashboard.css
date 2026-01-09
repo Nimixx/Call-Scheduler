@@ -3,8 +3,15 @@
  * Dashboard-specific styles and layouts
  */
 
-.cs-dashboard-page h1 {
-    margin-bottom: var(--cs-space-2xl);
+/* Stats Section */
+.cs-stats-section {
+    margin-bottom: var(--cs-space-lg);
+}
+
+.cs-stats-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: var(--cs-space-lg);
 }
 
 /* My Bookings Section */

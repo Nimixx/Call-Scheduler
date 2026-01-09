@@ -73,6 +73,43 @@ final class BookingsRepository
         return $wpdb->get_results($wpdb->prepare($sql, $limit));
     }
 
+    public function getUserBookingsWithPagination(
+        int $userId,
+        ?string $status = null,
+        ?string $dateFrom = null,
+        ?string $dateTo = null,
+        int $page = 1
+    ): array {
+        global $wpdb;
+
+        $where = $this->buildWhereClauseForUserWithDates($userId, $status, $dateFrom, $dateTo);
+        $offset = ($page - 1) * self::PER_PAGE;
+
+        $sql = "SELECT b.*, u.display_name as team_member_name
+                FROM {$wpdb->prefix}cs_bookings b
+                LEFT JOIN {$wpdb->users} u ON b.user_id = u.ID
+                {$where}
+                ORDER BY b.booking_date DESC, b.booking_time DESC
+                LIMIT %d OFFSET %d";
+
+        return $wpdb->get_results($wpdb->prepare($sql, self::PER_PAGE, $offset));
+    }
+
+    public function countUserBookings(
+        int $userId,
+        ?string $status = null,
+        ?string $dateFrom = null,
+        ?string $dateTo = null
+    ): int {
+        global $wpdb;
+
+        $where = $this->buildWhereClauseForUserWithDates($userId, $status, $dateFrom, $dateTo);
+
+        $sql = "SELECT COUNT(*) FROM {$wpdb->prefix}cs_bookings b {$where}";
+
+        return (int) $wpdb->get_var($sql);
+    }
+
     public function countBookings(
         ?string $status = null,
         ?string $dateFrom = null,
@@ -360,6 +397,36 @@ final class BookingsRepository
         // Optionally filter by status
         if ($status !== null && BookingStatus::isValid($status)) {
             $conditions[] = $wpdb->prepare('b.status = %s', $status);
+        }
+
+        return $this->buildWhereFromConditions($conditions);
+    }
+
+    private function buildWhereClauseForUserWithDates(
+        int $userId,
+        ?string $status,
+        ?string $dateFrom,
+        ?string $dateTo
+    ): string {
+        global $wpdb;
+
+        $conditions = [];
+
+        // Always filter by user_id
+        $conditions[] = $wpdb->prepare('b.user_id = %d', $userId);
+
+        // Optionally filter by status
+        if ($status !== null && BookingStatus::isValid($status)) {
+            $conditions[] = $wpdb->prepare('b.status = %s', $status);
+        }
+
+        // Optionally filter by date range
+        if ($dateFrom !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+            $conditions[] = $wpdb->prepare('b.booking_date >= %s', $dateFrom);
+        }
+
+        if ($dateTo !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+            $conditions[] = $wpdb->prepare('b.booking_date <= %s', $dateTo);
         }
 
         return $this->buildWhereFromConditions($conditions);

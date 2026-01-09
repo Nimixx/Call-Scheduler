@@ -171,16 +171,26 @@ final class Plugin
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
         if (Config::isOriginAllowed($origin)) {
-            // Use true as second param to replace any existing headers from other plugins
-            header("Access-Control-Allow-Origin: {$origin}", true);
-            header('Access-Control-Allow-Methods: GET, POST, OPTIONS', true);
-            header('Access-Control-Allow-Headers: Content-Type, X-WP-Nonce, X-CS-Token', true);
-            header('Access-Control-Allow-Credentials: true', true);
-            header('Access-Control-Max-Age: 3600', true);
-            header('Access-Control-Expose-Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset', true);
+            // Only add headers if not already set by another plugin
+            $this->setHeaderIfNotExists('Access-Control-Allow-Origin', $origin);
+            $this->setHeaderIfNotExists('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+            $this->setHeaderIfNotExists('Access-Control-Allow-Headers', 'Content-Type, X-WP-Nonce, X-CS-Token');
+            $this->setHeaderIfNotExists('Access-Control-Allow-Credentials', 'true');
+            $this->setHeaderIfNotExists('Access-Control-Max-Age', '3600');
+            $this->setHeaderIfNotExists('Access-Control-Expose-Headers', 'X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset');
         } elseif (!empty($origin)) {
             Security\AuditLogger::corsRejected($origin);
         }
+    }
+
+    private function setHeaderIfNotExists(string $name, string $value): void
+    {
+        foreach (headers_list() as $header) {
+            if (stripos($header, $name . ':') === 0) {
+                return; // Header already exists
+            }
+        }
+        header("{$name}: {$value}");
     }
 
     public function handleSeederAction(): void

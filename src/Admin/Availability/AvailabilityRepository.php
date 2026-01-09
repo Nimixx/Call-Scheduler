@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CallScheduler\Admin\Availability;
 
 use CallScheduler\Cache;
+use CallScheduler\ConsultantRepository;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -30,7 +31,7 @@ final class AvailabilityRepository
                 'meta_key' => 'cs_is_team_member',
                 'meta_value' => '1',
             ]),
-            12 * HOUR_IN_SECONDS // Cache for 12 hours
+            12 * HOUR_IN_SECONDS
         );
     }
 
@@ -41,11 +42,16 @@ final class AvailabilityRepository
             function () use ($user_id) {
                 global $wpdb;
 
+                $consultant = $this->getConsultantForUser($user_id);
+                if ($consultant === null) {
+                    return [];
+                }
+
                 $results = $wpdb->get_results($wpdb->prepare(
                     "SELECT day_of_week, start_time, end_time
                      FROM {$wpdb->prefix}cs_availability
-                     WHERE user_id = %d",
-                    $user_id
+                     WHERE consultant_id = %d",
+                    $consultant->id
                 ));
 
                 $availability = [];
@@ -55,16 +61,19 @@ final class AvailabilityRepository
 
                 return $availability;
             },
-            DAY_IN_SECONDS // Cache for 24 hours
+            DAY_IN_SECONDS
         );
     }
 
     public function deleteAvailability(int $user_id): void
     {
         global $wpdb;
-        $wpdb->delete($wpdb->prefix . 'cs_availability', ['user_id' => $user_id]);
 
-        // Invalidate cache for this user
+        $consultant = $this->getConsultantForUser($user_id);
+        if ($consultant !== null) {
+            $wpdb->delete($wpdb->prefix . 'cs_availability', ['consultant_id' => $consultant->id]);
+        }
+
         $this->cache->delete("availability_{$user_id}");
     }
 
@@ -72,7 +81,13 @@ final class AvailabilityRepository
     {
         global $wpdb;
 
+        $consultant = $this->getConsultantForUser($user_id);
+        if ($consultant === null) {
+            return false;
+        }
+
         $result = $wpdb->insert($wpdb->prefix . 'cs_availability', [
+            'consultant_id' => $consultant->id,
             'user_id' => $user_id,
             'day_of_week' => $day_num,
             'start_time' => $start_time . ':00',
@@ -80,11 +95,16 @@ final class AvailabilityRepository
         ]);
 
         if ($result !== false) {
-            // Invalidate cache for this user on successful insert
             $this->cache->delete("availability_{$user_id}");
         }
 
         return $result !== false;
+    }
+
+    private function getConsultantForUser(int $user_id): ?\CallScheduler\Consultant
+    {
+        $repository = new ConsultantRepository();
+        return $repository->findByWpUserId($user_id);
     }
 
     public function isPluginInstalled(): bool
@@ -97,11 +117,6 @@ final class AvailabilityRepository
         return $wpdb->get_var($query) === $table;
     }
 
-    /**
-     * Invalidate team members cache
-     *
-     * Should be called when team member status changes
-     */
     public function invalidateTeamMembersCache(): void
     {
         $this->cache->delete('team_members');

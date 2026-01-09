@@ -44,9 +44,9 @@ final class BookingsRepository
         $where = $this->buildWhereClause($status, $dateFrom, $dateTo);
         $offset = ($page - 1) * self::PER_PAGE;
 
-        $sql = "SELECT b.*, u.display_name as team_member_name
+        $sql = "SELECT b.*, c.display_name as team_member_name
                 FROM {$wpdb->prefix}cs_bookings b
-                LEFT JOIN {$wpdb->users} u ON b.user_id = u.ID
+                LEFT JOIN {$wpdb->prefix}cs_consultants c ON b.consultant_id = c.id
                 {$where}
                 ORDER BY b.booking_date DESC, b.booking_time DESC
                 LIMIT %d OFFSET %d";
@@ -63,9 +63,9 @@ final class BookingsRepository
 
         $where = $this->buildWhereClauseForUser($userId, $status);
 
-        $sql = "SELECT b.*, u.display_name as team_member_name
+        $sql = "SELECT b.*, c.display_name as team_member_name
                 FROM {$wpdb->prefix}cs_bookings b
-                LEFT JOIN {$wpdb->users} u ON b.user_id = u.ID
+                LEFT JOIN {$wpdb->prefix}cs_consultants c ON b.consultant_id = c.id
                 {$where}
                 ORDER BY b.booking_date DESC, b.booking_time DESC
                 LIMIT %d";
@@ -85,9 +85,9 @@ final class BookingsRepository
         $where = $this->buildWhereClauseForUserWithDates($userId, $status, $dateFrom, $dateTo);
         $offset = ($page - 1) * self::PER_PAGE;
 
-        $sql = "SELECT b.*, u.display_name as team_member_name
+        $sql = "SELECT b.*, c.display_name as team_member_name
                 FROM {$wpdb->prefix}cs_bookings b
-                LEFT JOIN {$wpdb->users} u ON b.user_id = u.ID
+                LEFT JOIN {$wpdb->prefix}cs_consultants c ON b.consultant_id = c.id
                 {$where}
                 ORDER BY b.booking_date DESC, b.booking_time DESC
                 LIMIT %d OFFSET %d";
@@ -233,9 +233,9 @@ final class BookingsRepository
         global $wpdb;
 
         return $wpdb->get_row($wpdb->prepare(
-            "SELECT b.*, u.display_name as team_member_name
+            "SELECT b.*, c.display_name as team_member_name
              FROM {$wpdb->prefix}cs_bookings b
-             LEFT JOIN {$wpdb->users} u ON b.user_id = u.ID
+             LEFT JOIN {$wpdb->prefix}cs_consultants c ON b.consultant_id = c.id
              WHERE b.id = %d",
             $id
         ));

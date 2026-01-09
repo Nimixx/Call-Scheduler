@@ -15,6 +15,12 @@ final class Installer
     public static function activate(): void
     {
         self::createTables();
+
+        // Run migrations (creates consultant profiles for existing team members)
+        self::migrateTeamMembersToConsultants();
+        self::migrateAvailabilityToConsultantId();
+        self::migrateBookingsToConsultantId();
+
         self::setDbVersion();
         flush_rewrite_rules();
 
@@ -68,6 +74,33 @@ final class Installer
         dbDelta($sql_bookings);
 
         self::addUniqueBookingConstraint();
+        self::createConsultantsTable();
+    }
+
+    private static function createConsultantsTable(): void
+    {
+        global $wpdb;
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+        $sql = "CREATE TABLE {$wpdb->prefix}cs_consultants (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            public_id VARCHAR(8) NOT NULL,
+            wp_user_id BIGINT UNSIGNED NOT NULL,
+            display_name VARCHAR(255) NOT NULL,
+            title VARCHAR(255) DEFAULT NULL,
+            bio TEXT DEFAULT NULL,
+            is_active TINYINT UNSIGNED NOT NULL DEFAULT 1,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY unique_public_id (public_id),
+            UNIQUE KEY unique_wp_user (wp_user_id),
+            KEY idx_active (is_active)
+        ) $charset_collate;";
+
+        dbDelta($sql);
     }
 
     private static function addUniqueBookingConstraint(): void
@@ -118,10 +151,102 @@ final class Installer
             return;
         }
 
+        // Create consultants table if needed
+        self::createConsultantsTable();
+
+        // Migrate team members to consultants
+        self::migrateTeamMembersToConsultants();
+
+        // Add consultant_id to availability and bookings
+        self::migrateAvailabilityToConsultantId();
+        self::migrateBookingsToConsultantId();
+
         // Add optimized indexes (safe to run multiple times)
         self::addOptimizedIndexes();
 
         self::setDbVersion();
+    }
+
+    /**
+     * Migrate existing team members to consultants table
+     */
+    private static function migrateTeamMembersToConsultants(): void
+    {
+        $repository = new ConsultantRepository();
+
+        $team_members = get_users([
+            'meta_key' => 'cs_is_team_member',
+            'meta_value' => '1',
+        ]);
+
+        foreach ($team_members as $user) {
+            // Skip if already has consultant profile
+            if ($repository->findByWpUserId($user->ID) !== null) {
+                continue;
+            }
+
+            $repository->createForUser($user->ID);
+        }
+    }
+
+    /**
+     * Add consultant_id column to availability table and migrate data
+     */
+    private static function migrateAvailabilityToConsultantId(): void
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . 'cs_availability';
+
+        // Check if consultant_id column exists
+        $column = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM {$table} LIKE %s", 'consultant_id'));
+
+        if ($column) {
+            return; // Already migrated
+        }
+
+        // Add consultant_id column
+        $wpdb->query("ALTER TABLE {$table} ADD COLUMN consultant_id BIGINT UNSIGNED DEFAULT NULL AFTER id");
+
+        // Populate consultant_id from user_id
+        $wpdb->query("
+            UPDATE {$table} a
+            INNER JOIN {$wpdb->prefix}cs_consultants c ON a.user_id = c.wp_user_id
+            SET a.consultant_id = c.id
+        ");
+
+        // Add index
+        $wpdb->query("ALTER TABLE {$table} ADD INDEX idx_consultant (consultant_id)");
+    }
+
+    /**
+     * Add consultant_id column to bookings table and migrate data
+     */
+    private static function migrateBookingsToConsultantId(): void
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . 'cs_bookings';
+
+        // Check if consultant_id column exists
+        $column = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM {$table} LIKE %s", 'consultant_id'));
+
+        if ($column) {
+            return; // Already migrated
+        }
+
+        // Add consultant_id column
+        $wpdb->query("ALTER TABLE {$table} ADD COLUMN consultant_id BIGINT UNSIGNED DEFAULT NULL AFTER id");
+
+        // Populate consultant_id from user_id
+        $wpdb->query("
+            UPDATE {$table} b
+            INNER JOIN {$wpdb->prefix}cs_consultants c ON b.user_id = c.wp_user_id
+            SET b.consultant_id = c.id
+        ");
+
+        // Add index for consultant_id
+        $wpdb->query("ALTER TABLE {$table} ADD INDEX idx_consultant (consultant_id)");
     }
 
     /**

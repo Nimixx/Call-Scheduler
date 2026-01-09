@@ -24,10 +24,10 @@ final class BookingsController extends RestController
             'callback' => [$this, 'createBooking'],
             'permission_callback' => '__return_true',
             'args' => [
-                'user_id' => [
+                'consultant_id' => [
                     'required' => true,
-                    'type' => 'integer',
-                    'sanitize_callback' => 'absint',
+                    'type' => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
                 ],
                 'customer_name' => [
                     'required' => true,
@@ -81,16 +81,16 @@ final class BookingsController extends RestController
 
         global $wpdb;
 
-        $user_id = $request->get_param('user_id');
+        $consultant_id = $request->get_param('consultant_id');
         $customer_name = $request->get_param('customer_name');
         $customer_email = $request->get_param('customer_email');
         $booking_date = $request->get_param('booking_date');
         $booking_time = $request->get_param('booking_time');
 
-        // Validate team member
-        $error = $this->validateTeamMember($user_id);
-        if ($error) {
-            return $error;
+        // Validate consultant
+        $consultant = $this->validateConsultant($consultant_id);
+        if ($consultant instanceof WP_Error) {
+            return $consultant;
         }
 
         // Validate email
@@ -110,8 +110,8 @@ final class BookingsController extends RestController
             return $error;
         }
 
-        // Validate slot is within team member's availability
-        $error = $this->validateAvailability($user_id, $booking_date, $booking_time);
+        // Validate slot is within consultant's availability
+        $error = $this->validateAvailability($consultant->id, $booking_date, $booking_time);
         if ($error) {
             return $error;
         }
@@ -120,7 +120,8 @@ final class BookingsController extends RestController
         $result = $wpdb->insert(
             $wpdb->prefix . 'cs_bookings',
             [
-                'user_id' => $user_id,
+                'consultant_id' => $consultant->id,
+                'user_id' => $consultant->wpUserId, // Keep for backwards compatibility
                 'customer_name' => $customer_name,
                 'customer_email' => $customer_email,
                 'booking_date' => $booking_date,
@@ -128,7 +129,7 @@ final class BookingsController extends RestController
                 'status' => BookingStatus::PENDING,
                 'created_at' => current_time('mysql'),
             ],
-            ['%d', '%s', '%s', '%s', '%s', '%s', '%s']
+            ['%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
         );
 
         if ($result === false) {
@@ -141,7 +142,7 @@ final class BookingsController extends RestController
         $booking_id = $wpdb->insert_id;
 
         // Fire action for cache invalidation, emails, and other hooks
-        do_action('cs_booking_created', $booking_id, $user_id, $booking_date);
+        do_action('cs_booking_created', $booking_id, $consultant->wpUserId, $booking_date);
 
         // Send webhook notification (non-blocking)
         $booking_data = [
@@ -150,14 +151,15 @@ final class BookingsController extends RestController
             'customer_email' => $customer_email,
             'booking_date' => $booking_date,
             'booking_time' => $booking_time,
-            'user_id' => $user_id,
+            'consultant_id' => $consultant->publicId,
+            'user_id' => $consultant->wpUserId, // Keep for backwards compatibility
             'status' => BookingStatus::PENDING,
         ];
         Plugin::getContainer()->webhook()->sendBookingCreated($booking_data);
 
         return $this->successResponse([
             'id' => $booking_id,
-            'user_id' => $user_id,
+            'consultant_id' => $consultant->publicId,
             'customer_name' => $customer_name,
             'customer_email' => $customer_email,
             'booking_date' => $booking_date,
@@ -209,7 +211,7 @@ final class BookingsController extends RestController
         return null;
     }
 
-    private function validateAvailability(int $user_id, string $date, string $time): ?WP_Error
+    private function validateAvailability(int $consultantId, string $date, string $time): ?WP_Error
     {
         global $wpdb;
 
@@ -217,8 +219,8 @@ final class BookingsController extends RestController
 
         $availability = $wpdb->get_row($wpdb->prepare(
             "SELECT start_time, end_time FROM {$wpdb->prefix}cs_availability
-             WHERE user_id = %d AND day_of_week = %d",
-            $user_id,
+             WHERE consultant_id = %d AND day_of_week = %d",
+            $consultantId,
             $day_of_week
         ));
 

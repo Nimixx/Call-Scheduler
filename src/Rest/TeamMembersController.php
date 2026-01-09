@@ -32,23 +32,22 @@ final class TeamMembersController extends RestController
 
         global $wpdb;
 
-        $users = get_users([
-            'meta_key' => 'cs_is_team_member',
-            'meta_value' => '1',
-        ]);
+        $repository = new \CallScheduler\ConsultantRepository();
+        $consultants = $repository->getActiveConsultants();
 
-        $data = array_map(function ($user) use ($wpdb) {
+        $data = array_map(function ($consultant) use ($wpdb) {
             $available_days = $wpdb->get_col($wpdb->prepare(
-                "SELECT day_of_week FROM {$wpdb->prefix}cs_availability WHERE user_id = %d",
-                $user->ID
+                "SELECT day_of_week FROM {$wpdb->prefix}cs_availability WHERE consultant_id = %d",
+                $consultant->id
             ));
 
             return [
-                'id' => $user->ID,
-                'name' => $user->display_name,
+                'id' => $consultant->publicId,
+                'name' => $consultant->displayName,
+                'title' => $consultant->title,
                 'available_days' => array_map('intval', $available_days),
             ];
-        }, $users);
+        }, $consultants);
 
         return $this->successResponse($data, 'team-members');
     }

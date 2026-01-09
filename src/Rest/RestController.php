@@ -82,31 +82,29 @@ abstract class RestController
     }
 
     // =========================================================================
-    // Team Member Validation
+    // Consultant Validation
     // =========================================================================
 
     /**
-     * Check if user is a valid team member
+     * Validate consultant exists and is active
+     *
+     * @param string $publicId The consultant's public ID
+     * @return \CallScheduler\Consultant|WP_Error
      */
-    protected function isValidTeamMember(int $user_id): bool
+    protected function validateConsultant(string $publicId): \CallScheduler\Consultant|WP_Error
     {
-        $user = get_user_by('ID', $user_id);
-        if (!$user) {
-            return false;
+        $repository = new \CallScheduler\ConsultantRepository();
+        $consultant = $repository->findByPublicId($publicId);
+
+        if ($consultant === null) {
+            return $this->errorResponse('invalid_consultant', 'Invalid consultant.', 400);
         }
 
-        return get_user_meta($user_id, 'cs_is_team_member', true) === '1';
-    }
-
-    /**
-     * Validate team member and return error if invalid
-     */
-    protected function validateTeamMember(int $user_id): ?WP_Error
-    {
-        if (!$this->isValidTeamMember($user_id)) {
-            return $this->errorResponse('invalid_team_member', 'Invalid team member.', 400);
+        if (!$consultant->isActive) {
+            return $this->errorResponse('consultant_inactive', 'Consultant is not available.', 400);
         }
-        return null;
+
+        return $consultant;
     }
 
     // =========================================================================

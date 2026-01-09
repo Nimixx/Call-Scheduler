@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CallScheduler\Admin\Availability;
 
+use CallScheduler\ConsultantRepository;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -22,7 +24,7 @@ final class AvailabilityService
 
     public function prepareData(): array
     {
-        $team_members = $this->repository->getTeamMembers();
+        $team_members = $this->getTeamMembersWithConsultantNames();
         $selected_user_id = isset($_GET['user_id']) ? absint($_GET['user_id']) : 0;
 
         // Auto-select first team member if none selected
@@ -38,6 +40,24 @@ final class AvailabilityService
             'show_success' => isset($_GET['updated']) && $_GET['updated'] === '1',
             'show_error' => isset($_GET['error']) && $_GET['error'] === '1',
         ];
+    }
+
+    /**
+     * Get team members with consultant display names
+     */
+    private function getTeamMembersWithConsultantNames(): array
+    {
+        $team_members = $this->repository->getTeamMembers();
+        $consultantRepo = new ConsultantRepository();
+
+        foreach ($team_members as $member) {
+            $consultant = $consultantRepo->findByWpUserId($member->ID);
+            if ($consultant !== null) {
+                $member->display_name = $consultant->displayName;
+            }
+        }
+
+        return $team_members;
     }
 
     public function saveAvailability(): void

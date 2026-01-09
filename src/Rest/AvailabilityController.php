@@ -23,10 +23,10 @@ final class AvailabilityController extends RestController
             'callback' => [$this, 'getAvailability'],
             'permission_callback' => '__return_true',
             'args' => [
-                'user_id' => [
+                'consultant_id' => [
                     'required' => true,
-                    'type' => 'integer',
-                    'sanitize_callback' => 'absint',
+                    'type' => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
                 ],
                 'date' => [
                     'required' => false,
@@ -47,13 +47,13 @@ final class AvailabilityController extends RestController
 
         global $wpdb;
 
-        $user_id = $request->get_param('user_id');
+        $consultant_id = $request->get_param('consultant_id');
         $date = $request->get_param('date') ?: wp_date('Y-m-d');
 
-        // Validate team member exists
-        $error = $this->validateTeamMember($user_id);
-        if ($error) {
-            return $error;
+        // Validate consultant
+        $consultant = $this->validateConsultant($consultant_id);
+        if ($consultant instanceof WP_Error) {
+            return $consultant;
         }
 
         // Validate date format
@@ -73,8 +73,8 @@ final class AvailabilityController extends RestController
         // Get availability for this day
         $availability = $wpdb->get_row($wpdb->prepare(
             "SELECT start_time, end_time FROM {$wpdb->prefix}cs_availability
-             WHERE user_id = %d AND day_of_week = %d",
-            $user_id,
+             WHERE consultant_id = %d AND day_of_week = %d",
+            $consultant->id,
             $day_of_week
         ));
 
@@ -89,11 +89,11 @@ final class AvailabilityController extends RestController
         // Get existing bookings for this date (pending and confirmed block the slot)
         $blocking_statuses = BookingStatus::blocking();
         $status_placeholders = implode(',', array_fill(0, count($blocking_statuses), '%s'));
-        $query_args = array_merge([$user_id, $date], $blocking_statuses);
+        $query_args = array_merge([$consultant->id, $date], $blocking_statuses);
 
         $booked_times = $wpdb->get_col($wpdb->prepare(
             "SELECT booking_time FROM {$wpdb->prefix}cs_bookings
-             WHERE user_id = %d AND booking_date = %s AND status IN ($status_placeholders)",
+             WHERE consultant_id = %d AND booking_date = %s AND status IN ($status_placeholders)",
             $query_args
         ));
 

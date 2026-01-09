@@ -8,6 +8,7 @@ use CallScheduler\Admin\Components\StatusBadgeRenderer;
 use CallScheduler\Admin\Components\FilterTabsRenderer;
 use CallScheduler\Admin\Components\TableRenderer;
 use CallScheduler\Admin\Components\NoticeRenderer;
+use CallScheduler\Admin\Components\RowActionsRenderer;
 use CallScheduler\BookingStatus;
 
 if (!defined('ABSPATH')) {
@@ -230,37 +231,11 @@ final class DashboardRenderer
                 <?php
             },
             function ($booking): void {
-                $availableStatuses = array_filter(
-                    BookingStatus::all(),
-                    fn($status) => $status !== $booking->status
-                );
-
-                $links = [];
-                foreach ($availableStatuses as $status) {
-                    $links[] = sprintf(
-                        '<a href="#" onclick="csChangeStatus(%d, \'%s\'); return false;">%s</a>',
-                        $booking->id,
-                        esc_attr($status),
-                        esc_html(BookingStatus::label($status))
-                    );
-                }
                 ?>
                 <tr>
                     <td>
                         <strong><?php echo esc_html($booking->customer_name); ?></strong>
-                        <?php if (!empty($links)): ?>
-                            <div class="row-actions">
-                                <span class="status"><?php echo implode(' | ', $links); ?></span>
-                                |
-                                <span class="delete">
-                                    <a href="#"
-                                       onclick="csDeleteBooking(<?php echo esc_attr($booking->id); ?>); return false;"
-                                       class="submitdelete">
-                                        <?php echo esc_html__('Smazat', 'call-scheduler'); ?>
-                                    </a>
-                                </span>
-                            </div>
-                        <?php endif; ?>
+                        <?php echo RowActionsRenderer::render((int) $booking->id, $booking->status); ?>
                     </td>
                     <td><?php echo esc_html($booking->customer_email); ?></td>
                     <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($booking->booking_date))); ?></td>

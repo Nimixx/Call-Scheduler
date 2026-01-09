@@ -7,6 +7,7 @@ namespace CallScheduler\Admin\Bookings;
 use CallScheduler\Admin\Components\StatusBadgeRenderer;
 use CallScheduler\Admin\Components\FilterTabsRenderer;
 use CallScheduler\Admin\Components\NoticeRenderer;
+use CallScheduler\Admin\Components\RowActionsRenderer;
 use CallScheduler\BookingStatus;
 
 if (!defined('ABSPATH')) {
@@ -240,34 +241,7 @@ final class BookingsRenderer
 
     private function renderRowActions(object $booking): void
     {
-        $availableStatuses = array_filter(
-            BookingStatus::all(),
-            fn($status) => $status !== $booking->status
-        );
-
-        $links = [];
-        foreach ($availableStatuses as $status) {
-            $links[] = sprintf(
-                '<a href="#" onclick="csChangeStatus(%d, \'%s\'); return false;">%s</a>',
-                $booking->id,
-                esc_attr($status),
-                esc_html(BookingStatus::label($status))
-            );
-        }
-
-        ?>
-        <div class="row-actions">
-            <span class="status"><?php echo implode(' | ', $links); ?></span>
-            |
-            <span class="delete">
-                <a href="#"
-                   onclick="csDeleteBooking(<?php echo esc_attr($booking->id); ?>); return false;"
-                   class="submitdelete">
-                    <?php echo esc_html__('Smazat', 'call-scheduler'); ?>
-                </a>
-            </span>
-        </div>
-        <?php
+        echo RowActionsRenderer::render((int) $booking->id, $booking->status);
     }
 
     private function renderPagination(array $data): void

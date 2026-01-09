@@ -171,12 +171,13 @@ final class Plugin
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
         if (Config::isOriginAllowed($origin)) {
-            header("Access-Control-Allow-Origin: {$origin}");
-            header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-            header('Access-Control-Allow-Headers: Content-Type, X-WP-Nonce, X-CS-Token');
-            header('Access-Control-Allow-Credentials: true');
-            header('Access-Control-Max-Age: 3600');
-            header('Access-Control-Expose-Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset');
+            // Use true as second param to replace any existing headers from other plugins
+            header("Access-Control-Allow-Origin: {$origin}", true);
+            header('Access-Control-Allow-Methods: GET, POST, OPTIONS', true);
+            header('Access-Control-Allow-Headers: Content-Type, X-WP-Nonce, X-CS-Token', true);
+            header('Access-Control-Allow-Credentials: true', true);
+            header('Access-Control-Max-Age: 3600', true);
+            header('Access-Control-Expose-Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset', true);
         } elseif (!empty($origin)) {
             Security\AuditLogger::corsRejected($origin);
         }

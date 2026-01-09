@@ -27,6 +27,21 @@ final class UserProfile
         add_action('edit_user_profile', [$this, 'renderField']);
         add_action('personal_options_update', [$this, 'saveField']);
         add_action('edit_user_profile_update', [$this, 'saveField']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueStyles']);
+    }
+
+    public function enqueueStyles(string $hook): void
+    {
+        if ($hook !== 'user-edit.php' && $hook !== 'profile.php') {
+            return;
+        }
+
+        wp_enqueue_style(
+            'cs-user-profile',
+            CS_PLUGIN_URL . 'assets/css/pages/user-profile.css',
+            [],
+            CS_VERSION
+        );
     }
 
     public function renderField(WP_User $user): void
@@ -44,79 +59,78 @@ final class UserProfile
         $title = $consultant ? ($consultant->title ?? '') : '';
         $bio = $consultant ? ($consultant->bio ?? '') : '';
         ?>
-        <h3><?php echo esc_html__('Nastavení rezervací', 'call-scheduler'); ?></h3>
-        <table class="form-table">
-            <tr>
-                <th>
-                    <label for="cs_is_team_member">
-                        <?php echo esc_html__('Dostupnost pro rezervace', 'call-scheduler'); ?>
-                    </label>
-                </th>
-                <td>
-                    <label>
-                        <input type="checkbox"
-                               name="cs_is_team_member"
-                               id="cs_is_team_member"
-                               value="1"
-                               <?php checked($is_team_member); ?> />
-                        <?php echo esc_html__('Tento uživatel je dostupný pro rezervace', 'call-scheduler'); ?>
-                    </label>
-                    <p class="description">
-                        <?php echo esc_html__('Pokud je zaškrtnuto, tento uživatel se zobrazí jako možnost pro rezervace a bude možné nastavit jeho dostupnost.', 'call-scheduler'); ?>
-                    </p>
-                </td>
-            </tr>
-        </table>
-
-        <div id="cs-consultant-fields" style="<?php echo $is_team_member ? '' : 'display:none;'; ?>">
-            <h3><?php echo esc_html__('Profil konzultanta', 'call-scheduler'); ?></h3>
+        <div class="cs-profile-section">
+            <h3><?php echo esc_html__('Nastavení rezervací', 'call-scheduler'); ?></h3>
             <table class="form-table">
-                <tr>
+                <tr class="cs-toggle-row">
                     <th>
-                        <label for="cs_consultant_display_name">
-                            <?php echo esc_html__('Zobrazované jméno', 'call-scheduler'); ?>
+                        <label for="cs_is_team_member">
+                            <?php echo esc_html__('Dostupnost pro rezervace', 'call-scheduler'); ?>
                         </label>
                     </th>
                     <td>
-                        <input type="text"
-                               name="cs_consultant_display_name"
-                               id="cs_consultant_display_name"
-                               value="<?php echo esc_attr($display_name); ?>"
-                               class="regular-text" />
+                        <label>
+                            <input type="checkbox"
+                                   name="cs_is_team_member"
+                                   id="cs_is_team_member"
+                                   value="1"
+                                   <?php checked($is_team_member); ?> />
+                            <?php echo esc_html__('Tento uživatel je dostupný pro rezervace', 'call-scheduler'); ?>
+                        </label>
                         <p class="description">
-                            <?php echo esc_html__('Jméno zobrazované zákazníkům při rezervaci.', 'call-scheduler'); ?>
+                            <?php echo esc_html__('Pokud je zaškrtnuto, tento uživatel se zobrazí jako možnost pro rezervace a bude možné nastavit jeho dostupnost.', 'call-scheduler'); ?>
                         </p>
                     </td>
                 </tr>
-                <tr>
-                    <th>
-                        <label for="cs_consultant_title">
-                            <?php echo esc_html__('Titul / Pozice', 'call-scheduler'); ?>
-                        </label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               name="cs_consultant_title"
-                               id="cs_consultant_title"
-                               value="<?php echo esc_attr($title); ?>"
-                               class="regular-text"
-                               placeholder="<?php echo esc_attr__('např. Obchodní konzultant', 'call-scheduler'); ?>" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <label for="cs_consultant_bio">
-                            <?php echo esc_html__('Krátký popis', 'call-scheduler'); ?>
-                        </label>
-                    </th>
-                    <td>
-                        <textarea name="cs_consultant_bio"
-                                  id="cs_consultant_bio"
-                                  rows="3"
-                                  class="large-text"><?php echo esc_textarea($bio); ?></textarea>
-                    </td>
-                </tr>
             </table>
+
+            <div id="cs-consultant-fields" style="<?php echo $is_team_member ? '' : 'display:none;'; ?>">
+                <h3><?php echo esc_html__('Profil konzultanta', 'call-scheduler'); ?></h3>
+                <table class="form-table">
+                    <tr>
+                        <th>
+                            <label for="cs_consultant_display_name">
+                                <?php echo esc_html__('Zobrazované jméno', 'call-scheduler'); ?>
+                            </label>
+                        </th>
+                        <td>
+                            <input type="text"
+                                   name="cs_consultant_display_name"
+                                   id="cs_consultant_display_name"
+                                   value="<?php echo esc_attr($display_name); ?>" />
+                            <p class="description">
+                                <?php echo esc_html__('Jméno zobrazované zákazníkům při rezervaci.', 'call-scheduler'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="cs_consultant_title">
+                                <?php echo esc_html__('Titul / Pozice', 'call-scheduler'); ?>
+                            </label>
+                        </th>
+                        <td>
+                            <input type="text"
+                                   name="cs_consultant_title"
+                                   id="cs_consultant_title"
+                                   value="<?php echo esc_attr($title); ?>"
+                                   placeholder="<?php echo esc_attr__('např. Obchodní konzultant', 'call-scheduler'); ?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="cs_consultant_bio">
+                                <?php echo esc_html__('Krátký popis', 'call-scheduler'); ?>
+                            </label>
+                        </th>
+                        <td>
+                            <textarea name="cs_consultant_bio"
+                                      id="cs_consultant_bio"
+                                      rows="3"><?php echo esc_textarea($bio); ?></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         <script>

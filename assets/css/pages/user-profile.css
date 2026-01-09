@@ -1,0 +1,88 @@
+/**
+ * Call Scheduler - User Profile Consultant Widget
+ * Styles for the consultant profile section on WordPress user edit page
+ */
+
+/* Main container wrapper */
+.cs-profile-section {
+    background: #fff;
+    border: 1px solid var(--wp-admin-gray-border, #c3c4c7);
+    border-left: 4px solid var(--wp-admin-blue, #2271b1);
+    margin: 20px 0;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.cs-profile-section h3 {
+    background: var(--cs-color-bg-light, #f6f7f7);
+    border-bottom: 1px solid var(--cs-color-border-light, #dcdcde);
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cs-profile-section .form-table {
+    margin: 0;
+}
+
+.cs-profile-section .form-table th {
+    padding: 16px 10px 16px 16px;
+    width: 200px;
+}
+
+.cs-profile-section .form-table td {
+    padding: 12px 16px 12px 10px;
+}
+
+/* Checkbox toggle styling */
+.cs-toggle-row {
+    background: var(--cs-color-bg-light, #f6f7f7);
+}
+
+.cs-toggle-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.cs-toggle-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+/* Consultant fields section */
+#cs-consultant-fields {
+    border-top: 1px solid var(--cs-color-border-light, #dcdcde);
+}
+
+#cs-consultant-fields h3 {
+    background: transparent;
+    border-bottom: 1px solid var(--cs-color-border-light, #dcdcde);
+    color: var(--wp-admin-blue, #2271b1);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+#cs-consultant-fields .form-table th {
+    color: var(--cs-color-text-dark, #1d2327);
+    font-weight: 500;
+}
+
+#cs-consultant-fields input[type="text"],
+#cs-consultant-fields textarea {
+    width: 100%;
+    max-width: 400px;
+}
+
+#cs-consultant-fields textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+#cs-consultant-fields .description {
+    color: var(--cs-color-text-light, #646970);
+    font-size: 12px;
+    margin-top: 4px;
+}

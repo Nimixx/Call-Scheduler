@@ -240,9 +240,9 @@ final class EmailService
         global $wpdb;
 
         $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT b.*, u.display_name as team_member_name
+            "SELECT b.*, c.display_name as team_member_name
              FROM {$wpdb->prefix}cs_bookings b
-             LEFT JOIN {$wpdb->users} u ON b.user_id = u.ID
+             LEFT JOIN {$wpdb->prefix}cs_consultants c ON b.consultant_id = c.id
              WHERE b.id = %d",
             $bookingId
         ), ARRAY_A);

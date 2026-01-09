@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace CallScheduler;
 
-use CallScheduler\BookingStatus;
-
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -15,8 +13,9 @@ final class Seeder
     public static function run(): void
     {
         $user_id = self::createTeamMember();
-        self::createAvailability($user_id);
-        self::createBookings($user_id);
+        $consultant = self::ensureConsultant($user_id);
+        self::createAvailability($consultant->id, $user_id);
+        self::createBookings($consultant->id, $user_id);
     }
 
     private static function createTeamMember(): int
@@ -40,10 +39,8 @@ final class Seeder
         ]);
 
         if (is_wp_error($user_id)) {
-            // User might already exist - try to get it
             $user = get_user_by('login', 'team_member');
             if ($user === false) {
-                // Fallback: get first admin user
                 $admins = get_users(['role' => 'administrator', 'number' => 1]);
                 if (empty($admins)) {
                     wp_die('Cannot create or find a user for seeding.');
@@ -59,26 +56,39 @@ final class Seeder
         return $user_id;
     }
 
-    private static function createAvailability(int $user_id): void
+    private static function ensureConsultant(int $user_id): Consultant
+    {
+        $repository = new ConsultantRepository();
+        $consultant = $repository->findByWpUserId($user_id);
+
+        if ($consultant === null) {
+            $consultant = $repository->createForUser($user_id, 'Obchodní konzultant', 'Zkušený konzultant pro vaše potřeby.');
+        }
+
+        return $consultant;
+    }
+
+    private static function createAvailability(int $consultant_id, int $user_id): void
     {
         global $wpdb;
 
         $table = $wpdb->prefix . 'cs_availability';
 
         // Clear existing
-        $wpdb->delete($table, ['user_id' => $user_id]);
+        $wpdb->delete($table, ['consultant_id' => $consultant_id]);
 
-        // PO-PA (Mon-Fri): 08:00-18:00, ST (Wed): 09:00-14:00
+        // Mon-Fri: 08:00-18:00, Wed: 09:00-14:00
         $schedule = [
-            1 => ['08:00:00', '18:00:00'], // Pondělí
-            2 => ['08:00:00', '18:00:00'], // Úterý
-            3 => ['09:00:00', '14:00:00'], // Středa
-            4 => ['08:00:00', '18:00:00'], // Čtvrtek
-            5 => ['08:00:00', '18:00:00'], // Pátek
+            1 => ['08:00:00', '18:00:00'],
+            2 => ['08:00:00', '18:00:00'],
+            3 => ['09:00:00', '14:00:00'],
+            4 => ['08:00:00', '18:00:00'],
+            5 => ['08:00:00', '18:00:00'],
         ];
 
         foreach ($schedule as $day => $times) {
             $wpdb->insert($table, [
+                'consultant_id' => $consultant_id,
                 'user_id' => $user_id,
                 'day_of_week' => $day,
                 'start_time' => $times[0],
@@ -87,7 +97,7 @@ final class Seeder
         }
     }
 
-    private static function createBookings(int $user_id): void
+    private static function createBookings(int $consultant_id, int $user_id): void
     {
         global $wpdb;
 
@@ -96,7 +106,6 @@ final class Seeder
         // Clear existing seed bookings
         $wpdb->query("DELETE FROM {$table} WHERE customer_email LIKE '%@example.com'");
 
-        // Find next Monday
         $next_monday = date('Y-m-d', strtotime('next monday'));
 
         $bookings = [
@@ -139,6 +148,7 @@ final class Seeder
 
         foreach ($bookings as $booking) {
             $wpdb->insert($table, array_merge($booking, [
+                'consultant_id' => $consultant_id,
                 'user_id' => $user_id,
                 'created_at' => current_time('mysql'),
             ]));

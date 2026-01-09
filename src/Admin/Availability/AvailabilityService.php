@@ -48,12 +48,31 @@ final class AvailabilityService
     private function getTeamMembersWithConsultantNames(): array
     {
         $team_members = $this->repository->getTeamMembers();
-        $consultantRepo = new ConsultantRepository();
 
+        if (empty($team_members)) {
+            return $team_members;
+        }
+
+        // Fetch all consultants in one query to avoid N+1
+        global $wpdb;
+        $user_ids = array_map(fn($m) => $m->ID, $team_members);
+        $placeholders = implode(',', array_fill(0, count($user_ids), '%d'));
+
+        $consultants = $wpdb->get_results($wpdb->prepare(
+            "SELECT wp_user_id, display_name FROM {$wpdb->prefix}cs_consultants WHERE wp_user_id IN ($placeholders)",
+            $user_ids
+        ));
+
+        // Map consultant names by user_id
+        $consultant_names = [];
+        foreach ($consultants as $c) {
+            $consultant_names[(int) $c->wp_user_id] = $c->display_name;
+        }
+
+        // Apply consultant names to team members
         foreach ($team_members as $member) {
-            $consultant = $consultantRepo->findByWpUserId($member->ID);
-            if ($consultant !== null) {
-                $member->display_name = $consultant->displayName;
+            if (isset($consultant_names[$member->ID])) {
+                $member->display_name = $consultant_names[$member->ID];
             }
         }
 

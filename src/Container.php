@@ -72,7 +72,7 @@ final class Container
         return $this->get('cache');
     }
 
-    public function email(): Email
+    public function email(): Email\EmailService
     {
         return $this->get('email');
     }

@@ -3,11 +3,11 @@
  * Dashboard-specific styles and layouts
  */
 
-/* Stats Section */
-.cs-stats-section {
-    margin-bottom: var(--cs-space-lg);
+.cs-dashboard-page h1 {
+    margin-bottom: var(--cs-space-2xl);
 }
 
+/* Stats Section */
 .cs-stats-section h2 {
     font-size: 18px;
     font-weight: 600;

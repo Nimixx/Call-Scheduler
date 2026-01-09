@@ -66,7 +66,7 @@ final class Plugin
         $this->container->set('cache', fn() => new Cache());
 
         // Email service (singleton)
-        $this->container->set('email', fn(Container $c) => new Email());
+        $this->container->set('email', fn(Container $c) => new Email\EmailService());
 
         // Webhook service (singleton)
         $this->container->set('webhook', fn(Container $c) => new Webhook());
@@ -82,6 +82,10 @@ final class Plugin
 
         // Cache invalidation hooks
         add_action('cs_booking_created', [$this, 'invalidateBookingsCache']);
+
+        // Email notification hooks
+        add_action('cs_booking_created', [$this->container->email(), 'onBookingCreated'], 10, 3);
+        add_action('cs_booking_status_changed', [$this->container->email(), 'onStatusChanged'], 10, 3);
 
         // Register admin pages
         $adminPages = new Admin\AdminPages();

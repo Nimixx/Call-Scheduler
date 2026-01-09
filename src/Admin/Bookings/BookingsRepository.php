@@ -248,6 +248,10 @@ final class BookingsRepository
 
         global $wpdb;
 
+        // Get current status before update
+        $booking = $this->getBooking($id);
+        $oldStatus = $booking->status ?? null;
+
         $result = $wpdb->update(
             $wpdb->prefix . 'cs_bookings',
             ['status' => $newStatus],
@@ -258,6 +262,9 @@ final class BookingsRepository
 
         if ($result !== false) {
             $this->invalidateCache();
+
+            // Fire status change action for email notifications
+            do_action('cs_booking_status_changed', $id, $newStatus, $oldStatus);
         }
 
         return $result !== false;

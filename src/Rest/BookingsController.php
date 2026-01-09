@@ -6,7 +6,6 @@ namespace CallScheduler\Rest;
 
 use CallScheduler\BookingStatus;
 use CallScheduler\Config;
-use CallScheduler\Email;
 use CallScheduler\Plugin;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -18,13 +17,6 @@ if (!defined('ABSPATH')) {
 
 final class BookingsController extends RestController
 {
-    private Email $email;
-
-    public function __construct(?Email $email = null)
-    {
-        $this->email = $email ?? new Email();
-    }
-
     public function register(): void
     {
         register_rest_route(self::NAMESPACE, '/bookings', [
@@ -148,10 +140,10 @@ final class BookingsController extends RestController
 
         $booking_id = $wpdb->insert_id;
 
-        // Fire action for cache invalidation and other hooks
+        // Fire action for cache invalidation, emails, and other hooks
         do_action('cs_booking_created', $booking_id, $user_id, $booking_date);
 
-        // Send confirmation emails (non-blocking)
+        // Send webhook notification (non-blocking)
         $booking_data = [
             'id' => $booking_id,
             'customer_name' => $customer_name,
@@ -161,10 +153,6 @@ final class BookingsController extends RestController
             'user_id' => $user_id,
             'status' => BookingStatus::PENDING,
         ];
-        $this->email->sendCustomerConfirmation($booking_data);
-        $this->email->sendTeamMemberNotification($booking_data);
-
-        // Send webhook notification (non-blocking)
         Plugin::getContainer()->webhook()->sendBookingCreated($booking_data);
 
         return $this->successResponse([

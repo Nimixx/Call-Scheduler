@@ -200,7 +200,7 @@ final class DashboardRenderer
             <tbody>
                 <?php if (empty($data['bookings'])): ?>
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <?php echo esc_html__('Nebyly nalezeny žádné rezervace.', 'call-scheduler'); ?>
                         </td>
                     </tr>
@@ -231,6 +231,7 @@ final class DashboardRenderer
             <th><?php esc_html_e('Datum', 'call-scheduler'); ?></th>
             <th><?php esc_html_e('Čas', 'call-scheduler'); ?></th>
             <th><?php esc_html_e('Stav', 'call-scheduler'); ?></th>
+            <th class="cs-col-actions"><?php esc_html_e('Akce', 'call-scheduler'); ?></th>
         </tr>
         <?php
     }
@@ -256,6 +257,9 @@ final class DashboardRenderer
             </td>
             <td>
                 <?php echo StatusBadgeRenderer::render($booking->status); ?>
+            </td>
+            <td class="cs-col-actions">
+                <?php echo RowActionsRenderer::renderDeleteButton((int) $booking->id); ?>
             </td>
         </tr>
         <?php

@@ -29,6 +29,11 @@
     color: var(--wp-admin-blue);
 }
 
+.cs-col-actions {
+    width: 80px;
+    text-align: center;
+}
+
 /* Row States */
 .cs-row-disabled {
     opacity: 0.5;

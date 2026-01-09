@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Renders row action links for status changes and deletion
+ * Renders row action links for status changes
  *
  * Consolidates duplicate status action rendering logic from BookingsRenderer
  * and DashboardRenderer into a single, reusable component.
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 final class RowActionsRenderer
 {
     /**
-     * Render row action links (status changes and delete)
+     * Render row action links (status changes only)
      *
      * @param int $bookingId Booking ID
      * @param string $currentStatus Current booking status
@@ -57,18 +57,29 @@ final class RowActionsRenderer
         ?>
         <div class="row-actions">
             <span class="status"><?php echo implode(' | ', $links); ?></span>
-            |
-            <span class="delete">
-                <a href="#"
-                   class="cs-row-action-delete submitdelete"
-                   data-booking-id="<?php echo esc_attr($bookingId); ?>"
-                   role="button"
-                   aria-label="<?php esc_attr_e('Smazat tuto rezervaci', 'call-scheduler'); ?>"
-                   tabindex="0">
-                    <?php esc_html_e('Smazat', 'call-scheduler'); ?>
-                </a>
-            </span>
         </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render delete button for standalone column
+     *
+     * @param int $bookingId Booking ID
+     * @return string HTML for delete button
+     */
+    public static function renderDeleteButton(int $bookingId): string
+    {
+        ob_start();
+        ?>
+        <a href="#"
+           class="cs-row-action-delete submitdelete"
+           data-booking-id="<?php echo esc_attr($bookingId); ?>"
+           role="button"
+           aria-label="<?php esc_attr_e('Smazat tuto rezervaci', 'call-scheduler'); ?>"
+           tabindex="0">
+            <?php esc_html_e('Smazat', 'call-scheduler'); ?>
+        </a>
         <?php
         return ob_get_clean();
     }

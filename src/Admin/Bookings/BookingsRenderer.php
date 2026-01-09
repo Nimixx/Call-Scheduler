@@ -145,7 +145,7 @@ final class BookingsRenderer
             <tbody>
                 <?php if (empty($data['bookings'])): ?>
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <?php echo esc_html__('Nebyly nalezeny žádné rezervace.', 'call-scheduler'); ?>
                         </td>
                     </tr>
@@ -206,6 +206,7 @@ final class BookingsRenderer
             <th scope="col" class="manage-column"><?php echo esc_html__('Termín', 'call-scheduler'); ?></th>
             <th scope="col" class="manage-column"><?php echo esc_html__('Stav', 'call-scheduler'); ?></th>
             <th scope="col" class="manage-column"><?php echo esc_html__('Vytvořeno', 'call-scheduler'); ?></th>
+            <th scope="col" class="manage-column cs-col-actions"><?php echo esc_html__('Akce', 'call-scheduler'); ?></th>
         </tr>
         <?php
     }
@@ -243,6 +244,9 @@ final class BookingsRenderer
             </td>
             <td>
                 <span class="description"><?php echo esc_html(DateFormatter::dateTimeFromUtc($booking->created_at)); ?></span>
+            </td>
+            <td class="cs-col-actions">
+                <?php echo RowActionsRenderer::renderDeleteButton((int) $booking->id); ?>
             </td>
         </tr>
         <?php

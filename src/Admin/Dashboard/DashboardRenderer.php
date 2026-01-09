@@ -8,7 +8,7 @@ use CallScheduler\Admin\Components\StatusBadgeRenderer;
 use CallScheduler\Admin\Components\FilterTabsRenderer;
 use CallScheduler\Admin\Components\NoticeRenderer;
 use CallScheduler\Admin\Components\RowActionsRenderer;
-use CallScheduler\Helpers\DateFormatter;
+use CallScheduler\Admin\Bookings\DateFormatter;
 
 if (!defined('ABSPATH')) {
     exit;

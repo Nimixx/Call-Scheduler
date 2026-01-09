@@ -1,18 +1,18 @@
 <?php
 /**
- * Email Info Card Partial
+ * Email Info Card Partial (Clean Light Theme)
  *
  * Renders a styled information card with key-value pairs.
  *
  * Usage:
  *   <?php include __DIR__ . '/partials/info-card.php'; ?>
  *   <?php echo email_info_card([
- *       'Datum' => '15. ledna 2026',
- *       'Čas'   => '14:00',
+ *       'Date' => 'January 15, 2026',
+ *       'Time' => '14:00',
  *   ]); ?>
  *
- * @param array  $items - Associative array of label => value pairs
- * @param string $accentColor - Left border accent color (default: #6366f1)
+ * @param array  $items       - Associative array of label => value pairs
+ * @param string $accentColor - Left border accent color (default: #2563eb)
  * @return string HTML card markup
  */
 
@@ -21,27 +21,33 @@ if (!defined('ABSPATH')) {
 }
 
 if (!function_exists('email_info_card')) {
-    function email_info_card(array $items, string $accentColor = '#6366f1'): string
+    function email_info_card(array $items, string $accentColor = '#2563eb'): string
     {
         $rows = '';
+        $lastKey = array_key_last($items);
+
         foreach ($items as $label => $value) {
             $label = esc_html($label);
             $value = esc_html($value);
+            $isLast = $label === $lastKey;
+            $borderBottom = $isLast ? 'none' : '1px solid #f1f5f9';
+
             $rows .= <<<HTML
                 <tr>
                     <td style="
-                        padding: 12px 0;
-                        border-bottom: 1px solid #f3f4f6;
-                        color: #6b7280;
+                        padding: 14px 0;
+                        border-bottom: {$borderBottom};
+                        color: #64748b;
                         font-size: 14px;
-                        width: 100px;
+                        width: 90px;
                         vertical-align: top;
                     ">{$label}</td>
                     <td style="
-                        padding: 12px 0;
-                        border-bottom: 1px solid #f3f4f6;
-                        color: #1f2937;
+                        padding: 14px 0;
+                        border-bottom: {$borderBottom};
+                        color: #1e293b;
                         font-weight: 500;
+                        font-size: 15px;
                     ">{$value}</td>
                 </tr>
             HTML;
@@ -50,12 +56,12 @@ if (!function_exists('email_info_card')) {
         return <<<HTML
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="
             margin: 24px 0;
-            background-color: #f9fafb;
-            border-radius: 8px;
-            border-left: 4px solid {$accentColor};
+            background-color: #f8fafc;
+            border-radius: 12px;
+            border-left: 3px solid {$accentColor};
         ">
             <tr>
-                <td style="padding: 20px 24px;">
+                <td style="padding: 8px 24px;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                         {$rows}
                     </table>

@@ -185,6 +185,7 @@ final class BookingsRepository
             BookingStatus::PENDING => 0,
             BookingStatus::CONFIRMED => 0,
             BookingStatus::CANCELLED => 0,
+            BookingStatus::STORNO => 0,
         ];
 
         foreach ($results as $row) {

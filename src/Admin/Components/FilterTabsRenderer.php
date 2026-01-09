@@ -45,15 +45,19 @@ final class FilterTabsRenderer
                     <?php endif; ?>
                 </a> |
             </li>
-            <?php foreach ([BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED] as $index => $status): ?>
+            <?php
+            $statuses = [BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED, BookingStatus::STORNO];
+            $lastStatus = end($statuses);
+            foreach ($statuses as $status):
+            ?>
                 <li>
                     <a href="<?php echo esc_url(add_query_arg($queryParam, $status, $baseUrl)); ?>"
                        <?php echo $currentStatus === $status ? 'class="current"' : ''; ?>>
                         <?php echo esc_html(BookingStatus::label($status)); ?>
                         <?php if ($counts !== null): ?>
-                            <span class="count">(<?php echo esc_html($counts[$status]); ?>)</span>
+                            <span class="count">(<?php echo esc_html($counts[$status] ?? 0); ?>)</span>
                         <?php endif; ?>
-                    </a><?php echo $status !== BookingStatus::CANCELLED ? ' |' : ''; ?>
+                    </a><?php echo $status !== $lastStatus ? ' |' : ''; ?>
                 </li>
             <?php endforeach; ?>
         </ul>

@@ -30,8 +30,9 @@ include_once __DIR__ . '/partials/status-badge.php';
 // Determine accent color based on status
 $statusColors = [
     'pending'   => '#ea580c', // Orange
-    'confirmed' => '#10b981', // Green
-    'cancelled' => '#ef4444', // Red
+    'confirmed' => '#0073aa', // Blue
+    'cancelled' => '#646970', // Gray
+    'storno'    => '#7c3aed', // Purple
 ];
 
 $accentColor = $statusColor ?? ($statusColors[$newStatusRaw ?? 'pending'] ?? '#6366f1');
@@ -48,6 +49,7 @@ $preheaderTemplates = [
     'confirmed' => __('Great news! Your booking has been confirmed.', 'call-scheduler'),
     'cancelled' => __('Your booking has been cancelled.', 'call-scheduler'),
     'pending'   => __('Your booking status has been updated.', 'call-scheduler'),
+    'storno'    => __('Your booking has been reversed/refunded.', 'call-scheduler'),
 ];
 
 $preheader = $preheaderTemplates[$newStatusRaw ?? 'pending'] ??
@@ -62,6 +64,7 @@ $statusMessages = [
     'confirmed' => __('Great news! Your booking has been confirmed. We look forward to your appointment.', 'call-scheduler'),
     'cancelled' => __('Your booking has been cancelled. If you did not request this cancellation, please contact us.', 'call-scheduler'),
     'pending'   => __('Your booking is pending review and will be confirmed shortly.', 'call-scheduler'),
+    'storno'    => __('Your booking has been reversed. If you have any questions about your refund, please contact us.', 'call-scheduler'),
 ];
 
 $statusMessage = $statusMessages[$newStatusRaw ?? 'pending'] ??

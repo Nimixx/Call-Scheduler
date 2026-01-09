@@ -13,6 +13,7 @@
     --cs-status-pending: #ea580c;
     --cs-status-confirmed: #0073aa;
     --cs-status-cancelled: #646970;
+    --cs-status-storno: #7c3aed;
 
     /* Colors - Neutral */
     --cs-color-text-dark: #1d2327;

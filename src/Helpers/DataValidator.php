@@ -25,6 +25,7 @@ final class DataValidator
      * - 'pending': integer >= 0
      * - 'confirmed': integer >= 0
      * - 'cancelled': integer >= 0
+     * - 'storno': integer >= 0
      *
      * Also validates that 'all' equals the sum of individual statuses.
      *
@@ -38,7 +39,7 @@ final class DataValidator
             return false;
         }
 
-        $required_keys = ['all', BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED];
+        $required_keys = ['all', BookingStatus::PENDING, BookingStatus::CONFIRMED, BookingStatus::CANCELLED, BookingStatus::STORNO];
 
         // Check all required keys exist and have valid values
         foreach ($required_keys as $key) {
@@ -60,7 +61,8 @@ final class DataValidator
         // Consistency check: 'all' should equal sum of statuses
         $sum = (int) $counts[BookingStatus::PENDING]
             + (int) $counts[BookingStatus::CONFIRMED]
-            + (int) $counts[BookingStatus::CANCELLED];
+            + (int) $counts[BookingStatus::CANCELLED]
+            + (int) $counts[BookingStatus::STORNO];
 
         if ((int) $counts['all'] !== $sum) {
             return false;
@@ -72,7 +74,7 @@ final class DataValidator
     /**
      * Get default/safe booking counts
      *
-     * @return array{all: int, pending: int, confirmed: int, cancelled: int}
+     * @return array{all: int, pending: int, confirmed: int, cancelled: int, storno: int}
      */
     public static function getDefaultStatusCounts(): array
     {
@@ -81,6 +83,7 @@ final class DataValidator
             BookingStatus::PENDING => 0,
             BookingStatus::CONFIRMED => 0,
             BookingStatus::CANCELLED => 0,
+            BookingStatus::STORNO => 0,
         ];
     }
 }

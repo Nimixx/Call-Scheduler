@@ -16,6 +16,7 @@ final class BookingStatus
     public const PENDING = 'pending';
     public const CONFIRMED = 'confirmed';
     public const CANCELLED = 'cancelled';
+    public const STORNO = 'storno';
 
     /**
      * Get all valid statuses
@@ -28,6 +29,7 @@ final class BookingStatus
             self::PENDING,
             self::CONFIRMED,
             self::CANCELLED,
+            self::STORNO,
         ];
     }
 
@@ -61,6 +63,7 @@ final class BookingStatus
             self::PENDING => __('Čekající', 'call-scheduler'),
             self::CONFIRMED => __('Potvrzené', 'call-scheduler'),
             self::CANCELLED => __('Zrušené', 'call-scheduler'),
+            self::STORNO => __('Stornováno', 'call-scheduler'),
         ];
 
         return $labels[$status] ?? $status;
@@ -77,6 +80,7 @@ final class BookingStatus
             self::PENDING => '#ea580c',    // Orange - warning state
             self::CONFIRMED => '#0073aa',  // Blue - confirmed/success state
             self::CANCELLED => '#646970',  // Gray - neutral/cancelled state
+            self::STORNO => '#7c3aed',     // Purple - refunded/reversed state
         ];
 
         return $colors[$status] ?? '#646970';

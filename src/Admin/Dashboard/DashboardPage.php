@@ -45,6 +45,19 @@ final class DashboardPage
             [],
             CS_VERSION
         );
+
+        wp_enqueue_script(
+            'cs-admin-bookings',
+            CS_PLUGIN_URL . 'assets/js/admin-bookings.js',
+            [],
+            CS_VERSION,
+            true
+        );
+
+        wp_localize_script('cs-admin-bookings', 'csBookings', [
+            'confirmDelete' => __('Opravdu chcete smazat tuto rezervaci?', 'call-scheduler'),
+            'confirmBulkDelete' => __('Opravdu chcete smazat vybrané rezervace?', 'call-scheduler'),
+        ]);
     }
 
     public function render(): void
@@ -56,6 +69,11 @@ final class DashboardPage
         if (!$this->repository->isPluginInstalled()) {
             $this->renderer->renderInstallationError();
             return;
+        }
+
+        // Handle POST actions from dashboard
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handleDashboardAction();
         }
 
         $counts = $this->repository->countByStatus();
@@ -108,5 +126,91 @@ final class DashboardPage
             'confirmed' => (int) ($counts[BookingStatus::CONFIRMED] ?? 0),
             'cancelled' => (int) ($counts[BookingStatus::CANCELLED] ?? 0),
         ];
+    }
+
+    /**
+     * Handle POST actions from dashboard (status changes, deletes)
+     *
+     * @return void
+     */
+    private function handleDashboardAction(): void
+    {
+        if (!isset($_POST['cs_bookings_nonce'])) {
+            return;
+        }
+
+        if (!wp_verify_nonce($_POST['cs_bookings_nonce'], 'cs_bookings_action')) {
+            wp_die(__('Bezpečnostní kontrola selhala.', 'call-scheduler'));
+        }
+
+        $action = $_POST['cs_action'] ?? '';
+        $statusFilter = FilterSanitizer::sanitizeStatus('dashboard_status');
+
+        switch ($action) {
+            case 'change_status':
+                $this->handleStatusChange($statusFilter);
+                break;
+
+            case 'delete':
+                $this->handleDelete($statusFilter);
+                break;
+        }
+    }
+
+    /**
+     * Handle status change action
+     *
+     * @param string|null $statusFilter Current status filter
+     * @return void
+     */
+    private function handleStatusChange(?string $statusFilter): void
+    {
+        $bookingId = FilterSanitizer::sanitizePostInt('booking_id');
+        $newStatus = FilterSanitizer::sanitizePostStatus('new_status');
+
+        if ($bookingId === 0 || $newStatus === null) {
+            $this->redirectToDashboard($statusFilter);
+            return;
+        }
+
+        $this->repository->updateStatus($bookingId, $newStatus);
+        $this->redirectToDashboard($statusFilter);
+    }
+
+    /**
+     * Handle delete action
+     *
+     * @param string|null $statusFilter Current status filter
+     * @return void
+     */
+    private function handleDelete(?string $statusFilter): void
+    {
+        $bookingId = isset($_POST['booking_id']) ? absint($_POST['booking_id']) : 0;
+
+        if ($bookingId === 0) {
+            $this->redirectToDashboard($statusFilter);
+            return;
+        }
+
+        $this->repository->deleteBooking($bookingId);
+        $this->redirectToDashboard($statusFilter);
+    }
+
+    /**
+     * Redirect back to dashboard with optional status filter
+     *
+     * @param string|null $statusFilter Current status filter
+     * @return void
+     */
+    private function redirectToDashboard(?string $statusFilter): void
+    {
+        $args = ['page' => 'cs-dashboard'];
+
+        if ($statusFilter !== null) {
+            $args['dashboard_status'] = $statusFilter;
+        }
+
+        wp_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
     }
 }

@@ -7,6 +7,7 @@ namespace CallScheduler\Rest;
 use CallScheduler\BookingStatus;
 use CallScheduler\Config;
 use CallScheduler\Plugin;
+use CallScheduler\Security\AuditLogger;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
@@ -76,6 +77,7 @@ final class BookingsController extends RestController
 
         // Honeypot check - if filled, it's a bot
         if (!empty($request->get_param('website'))) {
+            AuditLogger::honeypotTriggered();
             return new WP_REST_Response(['id' => 0, 'status' => BookingStatus::PENDING], 201);
         }
 
@@ -90,29 +92,34 @@ final class BookingsController extends RestController
         // Validate consultant
         $consultant = $this->validateConsultant($consultant_id);
         if ($consultant instanceof WP_Error) {
+            AuditLogger::invalidInput('consultant_id', 'invalid');
             return $consultant;
         }
 
         // Validate email
         if (!is_email($customer_email)) {
+            AuditLogger::invalidInput('email', 'invalid_format');
             return $this->errorResponse('invalid_email', 'Invalid email address.');
         }
 
         // Validate date
         $error = $this->validateDate($booking_date);
         if ($error) {
+            AuditLogger::invalidInput('date', $error->get_error_code());
             return $error;
         }
 
         // Validate time
         $error = $this->validateTime($booking_time);
         if ($error) {
+            AuditLogger::invalidInput('time', $error->get_error_code());
             return $error;
         }
 
         // Validate slot is within consultant's availability
         $error = $this->validateAvailability($consultant->id, $booking_date, $booking_time);
         if ($error) {
+            AuditLogger::invalidInput('availability', $error->get_error_code());
             return $error;
         }
 
@@ -134,12 +141,24 @@ final class BookingsController extends RestController
 
         if ($result === false) {
             if (str_contains($wpdb->last_error, 'Duplicate entry')) {
+                AuditLogger::bookingAttempt('duplicate', [
+                    'consultant_id' => $consultant->publicId,
+                    'slot_date' => $booking_date,
+                ]);
                 return $this->errorResponse('slot_taken', 'This time slot is already booked.', 409);
             }
+            AuditLogger::bookingAttempt('db_error', [
+                'error_code' => 'insert_failed',
+            ]);
             return $this->errorResponse('db_error', 'Failed to create booking.', 500);
         }
 
         $booking_id = $wpdb->insert_id;
+
+        AuditLogger::bookingAttempt('success', [
+            'consultant_id' => $consultant->publicId,
+            'slot_date' => $booking_date,
+        ]);
 
         // Fire action for cache invalidation, emails, and other hooks
         do_action('cs_booking_created', $booking_id, $consultant->wpUserId, $booking_date);

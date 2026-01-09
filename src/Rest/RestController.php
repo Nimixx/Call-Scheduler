@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CallScheduler\Rest;
 
 use CallScheduler\Config;
+use CallScheduler\Security\AuditLogger;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -57,7 +58,13 @@ abstract class RestController
     protected function checkRateLimit(string $endpoint, int $limit): ?WP_Error
     {
         $limiter = $this->getRateLimiter($endpoint, $limit);
-        return $limiter->check();
+        $error = $limiter->check();
+
+        if ($error !== null) {
+            AuditLogger::rateLimitHit($endpoint, $limit);
+        }
+
+        return $error;
     }
 
     /**
@@ -127,11 +134,13 @@ abstract class RestController
         $token = $request->get_header('X-CS-Token');
 
         if (empty($token)) {
+            AuditLogger::invalidToken('missing');
             return $this->errorResponse('missing_token', 'Security token required.', 403);
         }
 
         $parts = explode(':', $token);
         if (count($parts) !== 2) {
+            AuditLogger::invalidToken('malformed');
             return $this->errorResponse('invalid_token', 'Invalid security token format.', 403);
         }
 
@@ -141,12 +150,14 @@ abstract class RestController
         $now = time();
         $token_time = (int) $timestamp;
         if (abs($now - $token_time) > 300) {
+            AuditLogger::invalidToken('expired');
             return $this->errorResponse('expired_token', 'Security token expired.', 403);
         }
 
         // Verify hash
         $expected_hash = hash_hmac('sha256', $timestamp, $secret);
         if (!hash_equals($expected_hash, $hash)) {
+            AuditLogger::invalidToken('invalid_hash');
             return $this->errorResponse('invalid_token', 'Invalid security token.', 403);
         }
 
